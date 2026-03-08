@@ -13,7 +13,7 @@ public class CelluleEtatMort implements CelluleEtat
     synchronized (CelluleEtatMort.class)
     {
       if (instance == null) instance = new CelluleEtatMort();
-      
+
     }
     return instance;
   }

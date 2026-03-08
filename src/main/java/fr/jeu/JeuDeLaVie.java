@@ -52,4 +52,13 @@ public class JeuDeLaVie
     }
     return s.toString();
   }
+
+  public int getXMax()
+  {
+    return xMax;
+  }
+  public int getYMax()
+  {
+    return yMax;
+  }
 }

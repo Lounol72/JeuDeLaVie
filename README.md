@@ -26,3 +26,11 @@ Premièrement nous allons implémentre la structure de données de Jeu de la Vie
 Ce modèle représente un inconvénient: celui de multiplier inutilement les instance des classes réprésentant les états vivant et mort des cellules. En effet, les classes ***CelluleEtatVivant***  ***CelluleEtatMort*** n'ont pas de variables d'instances. Leur état (au sens POO) ne peut pas être modifié. Il est donc inutle de disposer de plusieurs instances de ces classes. Vous allez y remédier en implementant le DP Singleton.
 
 # 2. Implémentation de la grille de cellules
+
+Le modèle des cellules étant implémenter, nous pouvons implémenter la grille de cellules, comme attribut de la class ***JeuDeLaVie***. Nous allons completer le programme selon le modèle donné ci-dessous. La méthode _initialiseGrille_ doit peupler le tableau avec des cellules vivantes ou mortes, en fonction de la méthode _rnd.nextBoolean()_ qui retourne un bouléen ( 0 ou 1). La méthode _nbVoisinsVivants_ de la classe ***Cellule*** retourne le nombre de cellules vivantes se trouvant dans le voisinnage de la cellule (8 emplacements à tester pour les cellules qui ne sont pas au bord).
+
+![GrilleCellules Diagramme](docs/GrilleCellules.png "GrilleCellules")
+
+# 3. Implémentation de l'intergace graphique
+
+
