@@ -17,3 +17,12 @@ Nous sommes ordonnés d'implémenter le Jeu de la Vie selon un modèle fondé su
 - Visiteur
 
 En séparant structures de données, règles de fonctionnement et interface graphique, la modélisation fondée sur les patrons de conception simplifie considérablement la maintenance du logiciel.
+
+# 1. Implémentation des cellules et leurs états
+Premièrement nous allons implémentre la structure de données de Jeu de la Vie à l'aide d'un tableau de cellules, chaque cellule étant caractérisée par son état (vivante ou morte)? Le modèle de référennce est la version minimale du DP Etat. Son instanciation pour le Jeu de la Vie est sur le diagramme d'états ci-dessous. La modification de l'état d'une cellule se fait par invocation des méthodes _vit_ et _meurt_ de la cellule.
+
+![CelluleEtat Diagramme](docs/CelluleEtat.png "CelluleEtat")
+
+Ce modèle représente un inconvénient: celui de multiplier inutilement les instance des classes réprésentant les états vivant et mort des cellules. En effet, les classes ***CelluleEtatVivant***  ***CelluleEtatMort*** n'ont pas de variables d'instances. Leur état (au sens POO) ne peut pas être modifié. Il est donc inutle de disposer de plusieurs instances de ces classes. Vous allez y remédier en implementant le DP Singleton.
+
+# 2. Implémentation de la grille de cellules
