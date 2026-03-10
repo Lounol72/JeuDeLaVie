@@ -31,6 +31,23 @@ Le modèle des cellules étant implémenter, nous pouvons implémenter la grille
 
 ![GrilleCellules Diagramme](docs/GrilleCellules.png "GrilleCellules")
 
-# 3. Implémentation de l'intergace graphique
+# 3. Implémentation de l'interface graphique
+
+L'intefarce graphique du jeu sera modéilisée selon le DP "Observateur". Dans notre cas, l'observable est une ***JeuDeLaVie***, et l'obeservateur est un ***JeuDeLaVieUI***. Nous allors implémenter le mobèle ci-dessous, puis nous allons écrire la méthode _main_ de ***JeuDeLaVie*** qui va instancer un ***JeuDeLaVie***, un ***JeuDeLaVieUI***, et qui va enregistrer ce dernier comme observateur. A la fin de cette étape, vous pourrez visualiser la population initiale aléatoire de cellules.
 
 
+![InterfaceGraphique Diagramme](docs/InterfaceGraphique.png "InterfaceGraphique")
+
+# 4.Implémentation des actions sur les cellules
+
+Dans l'implémentation "classique" du jeu de la vie, la génération suivates est construite dans un deuxième tableau, afin de ne pas modifier la génération courante. Une fois terminée, la génération suivante (qui devient la génération courante) est intégralement recopiée dans le premier tableau. Une autre solution consiste, dans un premier temps, à stocker dans une file d'attentes toutes les actions à effectuer (modifications des cellules), puis dans un deuxième temps à executer toutes les actions. Cette solution n'utilise pas de second tableau, ni d'étapes de recopie. Elle repose sur l'utilisation du DP "Commande".
+
+Dans ce DP, un "client" instancie des commandes destinées à un receveur, et un invoqueur déclenche l'execution des commandes. Dans l'image ci-dessous l'invocateur est un ***JeuDeLaVie***, les receveurs sont des cellules, et les actions sont _vit_ et _meurt_ (le client sera défini au cours de l'étape n°5). La méthode _executeCommandes_ éxécute toutes les commandes et vide la liste.
+
+![Commande Diagramme](docs/Commande.png "Commande")
+
+# 5. Implémentation des règles du jeu
+
+La cinquième étape consiste à écrire les règles du jeu en utilisant le DP "Visiteur". Un visiteur est une façon de séparer un algorithme d'une structure de données. Le client distribue un visiteur aux éléments, qui demandent à leur visiteur d'exécuter le traitement. Dans le diagramme ci-dessous, le client est le ***JeuDeLaVie***, les éléments sont des cellules, le visiteur est ***VisiteurClassique***. La métode  _distribueVisiteur_ invoque la méthode _accepte_ de toutes les cellules, lesquelles invoquent la méthode accepe de leur état(délégation). Enfin, ce dernier invoque la méthode du visiteur (visiteCelluleVivante ou visiteCelluleMorte), laquelle va instancier et ajouter une nouvelle commande (CommandeVit ou CommandeMeurt selon l'environment de la cellule) dans la fille d'attente de commandes du jeu.
+
+![Visiteur Diagramme](docs/Visiteur.png "Visiteur")

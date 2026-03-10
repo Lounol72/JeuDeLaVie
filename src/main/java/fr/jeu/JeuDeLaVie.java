@@ -1,48 +1,89 @@
 package fr.jeu;
 
+import fr.cellule.Cellule;
+import fr.cellule.CelluleEtatMort;
+import fr.cellule.CelluleEtatVivant;
+import fr.commande.Commande;
+import fr.ui.Observable;
+import fr.ui.Observateur;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Random;
 
-import fr.cellule.Cellule;
-import fr.cellule.CelluleEtatVivant;
-import fr.cellule.CelluleEtatMort;
+/**
+ * Représente le jeu de la vie.
+ *
+ * @author Lounol72
+ */
+public class JeuDeLaVie implements Observable {
+  private Cellule[][] grille;
+  private List<Commande> commandes;
+  private int maxX;
+  private int maxY;
 
-public class JeuDeLaVie
-{
-  private Cellule grille[][];
-  private int xMax;
-  private int yMax;
+  // Observateurs :
+  private List<Observateur> observateurs;
 
-  public JeuDeLaVie()
-  {
-    xMax = 10;
-    yMax = 10;
+  /** Constructeur du jeu de la vie, initialise le jeu avec les variables par "Défaut". */
+  public JeuDeLaVie() {
+    maxX = 10;
+    maxY = 10;
+    observateurs = new ArrayList<>();
+    commandes = new ArrayList<>();
   }
 
-  public void initialseGrille ()
-  {
+  /**
+   * Initialise la grille avec des Cellules d'etat random grâce à la méthode **rnd.nextBoolean** et
+   * selon celà nous lui donnons un état vivant ou mort.
+   */
+  public void initialseGrille() {
     Random rnd = new Random(System.currentTimeMillis());
-    grille = new Cellule[xMax][yMax];
-    for (int i = 0; i < grille.length; i++)
-      for (int j = 0; j < grille[i].length; j++)
-      {
-        grille[i][j] = new Cellule(rnd.nextBoolean() ? CelluleEtatVivant.getInstance() : CelluleEtatMort.getInstance(), i, j );
+    grille = new Cellule[maxX][maxY];
+    for (int i = 0; i < grille.length; i++) {
+      for (int j = 0; j < grille[i].length; j++) {
+        grille[i][j] =
+            new Cellule(
+                rnd.nextBoolean() ? CelluleEtatVivant.getInstance() : CelluleEtatMort.getInstance(),
+                i,
+                j);
       }
-
+    }
   }
 
-  public Cellule getGrille(int x, int y)
-  {
+  /**
+   * Récupère une cellule de la grille par rapport aux coordonnées.
+   *
+   * @param x int position
+   * @param y int position
+   * @return Cellule
+   * @throws throw new IndexOutOfBoundsException("Index " + x + " out of bounds for size " + xMax);
+   *     Si l'indice x est en dehors du tableau
+   * @throws throw new IndexOutOfBoundsException("Index " + y + " out of bounds for size " + yMax);
+   *     Si l'indice y est en dehors du tableau
+   */
+  public Cellule getGrille(int x, int y) {
     // Vérification des inputs
-    if (x < 0 || x>= xMax)
-      throw new IndexOutOfBoundsException("Index " + x + " out of bounds for size " + xMax);
-    if (y < 0 || x>= yMax)
-      throw new IndexOutOfBoundsException("Index " + y + " out of bounds for size " + yMax);
+    if (x < 0 || x >= maxX) {
+      throw new IndexOutOfBoundsException("Index " + x + " out of bounds for size " + maxX);
+    }
+    if (y < 0 || x >= maxY) {
+      throw new IndexOutOfBoundsException("Index " + y + " out of bounds for size " + maxY);
+    }
 
     return new Cellule(grille[x][y]);
   }
 
-  public String toString()
-  {
+  public void ajouteCommande(Commande c) {
+    commandes.add(c);
+  }
+
+  public void executeCommandes() {
+    commandes.forEach(Commande::executer);
+    commandes.clear();
+  }
+
+  @Override
+  public String toString() {
     StringBuilder s = new StringBuilder();
     for (int i = 0; i < grille.length; i++) {
       for (int j = 0; j < grille[i].length; j++) {
@@ -53,12 +94,28 @@ public class JeuDeLaVie
     return s.toString();
   }
 
-  public int getXMax()
-  {
-    return xMax;
+  public int getMaxX() {
+    return maxX;
   }
-  public int getYMax()
-  {
-    return yMax;
+
+  public int getMaxY() {
+    return maxY;
+  }
+
+  @Override
+  public void attacheObservateur(Observateur o) {
+    observateurs.add(o);
+  }
+
+  @Override
+  public void detacheObservateur(Observateur o) {
+    observateurs.remove(o);
+  }
+
+  @Override
+  public void notifieObservateur() {
+    for (Observateur o : observateurs) {
+      o.actualise();
+    }
   }
 }
