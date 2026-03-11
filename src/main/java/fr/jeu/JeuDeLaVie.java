@@ -7,6 +7,7 @@ import fr.commande.Commande;
 import fr.ui.Observable;
 import fr.ui.Observateur;
 import fr.visiteur.Visiteur;
+import fr.visiteur.VisiteurTerminal;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
@@ -24,11 +25,14 @@ public class JeuDeLaVie implements Observable {
   private List<Observateur> observateurs;
   private List<Commande> commandes;
   private Visiteur visiteur = null;
+  private VisiteurTerminal terminal = VisiteurTerminal.getInstance(this);
+  /** Si true, le terminal affiche les stats en console à chaque génération. */
+  private volatile boolean terminalActif = false;
 
   /** Constructeur du jeu de la vie, initialise le jeu avec les variables par "Défaut". */
   public JeuDeLaVie() {
-    maxX = 2000;
-    maxY = 1000;
+    maxX = 800;
+    maxY = 600;
     initClasses();
   }
 
@@ -78,6 +82,11 @@ public class JeuDeLaVie implements Observable {
     return grille[x][y];
   }
 
+  /** Accès direct pour boucle de rendu (x,y supposés valides). */
+  public boolean estCelluleVivante(int x, int y) {
+    return grille[x][y].estVivante();
+  }
+
   public void ajouteCommande(Commande c) {
     commandes.add(c);
   }
@@ -91,6 +100,9 @@ public class JeuDeLaVie implements Observable {
     for (Cellule[] list : grille) {
       for (Cellule cellule : list) {
         cellule.accepte(visiteur);
+        if (terminalActif) {
+          cellule.accepte(terminal);
+        }
       }
     }
   }
@@ -99,6 +111,18 @@ public class JeuDeLaVie implements Observable {
     distribueVisiteur();
     executeCommandes();
     notifieObservateur();
+    if (terminalActif) {
+      System.out.println(terminal);
+    }
+    terminal.nouvelleGeneration();
+  }
+
+  public boolean isTerminalActif() {
+    return terminalActif;
+  }
+
+  public void setTerminalActif(boolean actif) {
+    terminalActif = actif;
   }
 
   @Override
@@ -139,10 +163,6 @@ public class JeuDeLaVie implements Observable {
   }
 
   public void initVisiteur(Visiteur v) {
-    if (visiteur != null) {
-      System.out.println("Visiteur déjà initialisé");
-      return;
-    }
     visiteur = v;
   }
 }

@@ -64,3 +64,5 @@ Pour cette sixième étape nous devons créer au moins faire :
     - Contrôle de sectuibs des règles du jeu, etc.
 
 Pour commencer j'ai ajouter le DP "Etat" afin de gérer un menu de présentation, ainsi que des paramètres et le jeu en lui même, ce qui nous permettra plus tard d'ajouter des boutons pour contrôler les rêgles du jeu. J'ai aussi ajouter le fait que nous pouvons configurer les cellules lorsqu'elles sont en pause, ce qui permet donc de faire une configuration de départ, ou permet de la modifier " à la volée". J'ai aussi ajouter un système de zoom sur la grille, la taille de la grille personnalisable, ce qui remettra à 0 la grille si elle est déjà initialisé. Je controlerai aussi la taille des cellules.
+
+Pour se faire j'ai implémenter le pattern Singleton aux visiteurs, car nous n'avons aucunement besoin de plusieurs instance.

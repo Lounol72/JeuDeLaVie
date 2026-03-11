@@ -1,30 +1,26 @@
-package fr.ui;
+package fr.ui.bouton;
 
-import java.awt.Color;
+import fr.utilz.Constants;
 import java.awt.Font;
 import java.awt.FontMetrics;
 import java.awt.Graphics;
 
-import fr.etats.EtatJeu;
-
-/** Bouton permettant de changer l'état du jeu. */
-public class BoutonChangeurEtat extends Bouton {
-
+public class BoutonPause extends Bouton {
   private static final Font FONT_LABEL = new Font("Arial", Font.BOLD, 16);
-
-  private final EtatJeu action;
+  private boolean etat;
   private final String label;
 
-  public BoutonChangeurEtat(int x, int y, int largeur, int hauteur, EtatJeu action, String label) {
+  public BoutonPause(int x, int y, int largeur, int hauteur, boolean etatDefaut, String label) {
     super(x, y, largeur, hauteur);
-    this.action = action;
+    etat = etatDefaut;
+    Constants.pause = etat;
     this.label = label;
   }
 
   @Override
   public void dessiner(Graphics g) {
     super.dessiner(g);
-    g.setColor(Color.BLACK);
+    g.setColor(Constants.COULEUR_TEXTE);
     g.setFont(FONT_LABEL);
     FontMetrics fm = g.getFontMetrics();
     int lw = fm.stringWidth(label);
@@ -35,6 +31,7 @@ public class BoutonChangeurEtat extends Bouton {
 
   @Override
   public void appliquerAction() {
-    EtatJeu.setEtatActuel(action);
+    Constants.pause = !etat;
+    etat = Constants.pause;
   }
 }

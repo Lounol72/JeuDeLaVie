@@ -7,8 +7,22 @@ import fr.jeu.JeuDeLaVie;
 
 public class VisiteurClassique extends Visiteur {
 
-  public VisiteurClassique(JeuDeLaVie jeu) {
+  private static volatile VisiteurClassique instance = null;
+
+  private VisiteurClassique(JeuDeLaVie jeu) {
     super(jeu);
+  }
+
+  public static VisiteurClassique getInstance(JeuDeLaVie jeu) {
+    if (instance != null) {
+      return instance;
+    }
+    synchronized (VisiteurClassique.class) {
+      if (instance == null) {
+        instance = new VisiteurClassique(jeu);
+      }
+      return instance;
+    }
   }
 
   public void visiteCelluleVivante(Cellule c) {
@@ -21,4 +35,3 @@ public class VisiteurClassique extends Visiteur {
     if (voisins == 3) jeu.ajouteCommande(new CommandeVit(c));
   }
 }
-

@@ -2,11 +2,12 @@ package fr.etats;
 
 import fr.game.Game;
 import fr.jeu.JeuDeLaVie;
-import fr.ui.Bouton;
-import fr.ui.BoutonChangeurEtat;
-import fr.ui.BoutonPause;
+import fr.ui.bouton.Bouton;
+import fr.ui.bouton.BoutonAvancer;
+import fr.ui.bouton.BoutonChangeurEtat;
+import fr.ui.bouton.BoutonPause;
+import fr.ui.sliders.Slider;
 import fr.utilz.Constants;
-import java.awt.Color;
 import java.awt.Graphics;
 import java.awt.event.KeyEvent;
 import java.awt.event.MouseEvent;
@@ -19,13 +20,37 @@ public class EtatJeuGrille extends Etats {
   private static final int HAUTEUR_BOUTON = 44;
   private static int maxX;
   private static int maxY;
-  private static int tailleCellule;
 
-  /** Nombre de mises à jour avant une nouvelle génération (60 UPS / 12 = 5 gen/s). */
-  private static final int UPDATES_PAR_GENERATION = 12;
+  /** Taille d'une cellule en pixels ; recalculée dans appliquerDisposition. */
+  private int tailleCellule;
+  /** Bornes visibles pour clipping ; recalculées avec tailleCellule. */
+  private int xMaxVis;
+  private int yMaxVis;
+
+  /** Facteur zoom 0.5 à 3.0 ; conservé au resize. */
+  private double facteurZoom = 1.0;
+  private static final double ZOOM_MIN = 0.5;
+  private static final double ZOOM_MAX = 3.0;
+  /** Valeur slider 20 → zoom 1.0. */
+  private static final int VALEUR_ZOOM_NEUTRE = 20;
+
+  /** Base : 12 updates par génération à vitesse 1.0 (slider=50). */
+  private static final int BASE_UPDATES = 12;
+  /** Valeur slider correspondant à vitesse 1.0. */
+  private static final int VALEUR_NORMALE = 50;
+
+  private static final int LARGEUR_SLIDER = 28;
+  private static final int HAUTEUR_SLIDER = 200;
+  private static final int MARGIN_SLIDER = 20;
+  private static final int GAP_SLIDERS = 20;
 
   private final JeuDeLaVie jeuDeLaVie;
   private int compteurUpdates = 0;
+
+  private final Slider slider;
+  private final Slider sliderZoom;
+  /** Cache mis à jour quand le slider change ; évite getValue() à chaque frame. */
+  private volatile int updatesParGenerationCache = BASE_UPDATES;
 
   public EtatJeuGrille(Game jeu) {
     super(jeu);
@@ -44,20 +69,67 @@ public class EtatJeuGrille extends Etats {
             Constants.jeu_hauteur - 130,
             LARGEUR_BOUTON,
             HAUTEUR_BOUTON,
-            false,
+            true,
             "Pause"));
     this.jeuDeLaVie = jeu.getJeuDeLaVie();
     maxX = jeuDeLaVie.getMaxX();
     maxY = jeuDeLaVie.getMaxY();
-    tailleCellule =
-        Math.max(1, Math.min(Constants.jeu_largeur / maxX, Constants.jeu_hauteur / maxY));
+    boutons.add(
+        new BoutonAvancer(
+            50 + LARGEUR_BOUTON * 2 + 2 * GAP_BOUTONS,
+            Constants.jeu_hauteur - 130,
+            LARGEUR_BOUTON,
+            HAUTEUR_BOUTON,
+            "Avancer",
+            jeuDeLaVie));
+
+    recalculerTailleEtBornes(Constants.jeu_largeur, Constants.jeu_hauteur);
+
+    int sliderVitesseX = Constants.jeu_largeur - MARGIN_SLIDER - LARGEUR_SLIDER;
+    int sliderZoomX = sliderVitesseX - LARGEUR_SLIDER - GAP_SLIDERS;
+    int sliderY = (Constants.jeu_hauteur - HAUTEUR_SLIDER) / 2;
+    slider =
+        new Slider(
+            sliderVitesseX,
+            sliderY,
+            LARGEUR_SLIDER,
+            HAUTEUR_SLIDER,
+            0,
+            100,
+            VALEUR_NORMALE,
+            v -> {
+              int val = Math.max(1, v);
+              updatesParGenerationCache = Math.max(1, (BASE_UPDATES * VALEUR_NORMALE) / val);
+            });
+    sliderZoom =
+        new Slider(
+            sliderZoomX,
+            sliderY,
+            LARGEUR_SLIDER,
+            HAUTEUR_SLIDER,
+            0,
+            100,
+            VALEUR_ZOOM_NEUTRE,
+            v -> {
+              facteurZoom = ZOOM_MIN + (v / 100.0) * (ZOOM_MAX - ZOOM_MIN);
+              facteurZoom = Math.max(ZOOM_MIN, Math.min(ZOOM_MAX, facteurZoom));
+              largeurLayoutPrecedente = -1;
+            });
+  }
+
+  private void recalculerTailleEtBornes(int largeur, int hauteur) {
+    double tailleBase =
+        Math.max(1.0, Math.min((double) largeur / maxX, (double) hauteur / maxY));
+    tailleCellule = Math.max(1, (int) Math.round(tailleBase * facteurZoom));
+    xMaxVis = Math.min(maxX, (largeur / tailleCellule) + 1);
+    yMaxVis = Math.min(maxY, (hauteur / tailleCellule) + 1);
   }
 
   @Override
   public void mettreAJour() {
     if (Constants.pause) return;
     compteurUpdates++;
-    if (compteurUpdates >= UPDATES_PAR_GENERATION) {
+    if (compteurUpdates >= updatesParGenerationCache) {
       compteurUpdates = 0;
       jeuDeLaVie.calculerGenerationSuivante();
     }
@@ -72,12 +144,22 @@ public class EtatJeuGrille extends Etats {
     boutons
         .get(1)
         .setBounds(50 + LARGEUR_BOUTON + GAP_BOUTONS, yBoutons, LARGEUR_BOUTON, HAUTEUR_BOUTON);
+    boutons
+        .get(2)
+        .setBounds(
+            50 + LARGEUR_BOUTON * 2 + 2 * GAP_BOUTONS, yBoutons, LARGEUR_BOUTON, HAUTEUR_BOUTON);
+    recalculerTailleEtBornes(largeur, hauteur);
+    int sliderVitesseX = largeur - MARGIN_SLIDER - LARGEUR_SLIDER;
+    int sliderZoomX = sliderVitesseX - LARGEUR_SLIDER - GAP_SLIDERS;
+    int sliderY = (hauteur - HAUTEUR_SLIDER) / 2;
+    slider.setBounds(sliderVitesseX, sliderY, LARGEUR_SLIDER, HAUTEUR_SLIDER);
+    sliderZoom.setBounds(sliderZoomX, sliderY, LARGEUR_SLIDER, HAUTEUR_SLIDER);
   }
 
   @Override
   public void dessiner(Graphics g) {
     appliquerDispositionSiNecessaire();
-    g.setColor(Color.BLACK);
+    g.setColor(Constants.COULEUR_FOND_GRILLE);
     g.fillRect(0, 0, Constants.jeu_largeur, Constants.jeu_hauteur);
 
     if (jeuDeLaVie != null) {
@@ -87,6 +169,16 @@ public class EtatJeuGrille extends Etats {
     for (Bouton b : boutons) {
       b.dessiner(g);
     }
+    sliderZoom.dessiner(g);
+    slider.dessiner(g);
+  }
+
+  private boolean contientSliderVitesse(MouseEvent e) {
+    return slider.getDelimitation().contains(e.getX(), e.getY());
+  }
+
+  private boolean contientSliderZoom(MouseEvent e) {
+    return sliderZoom.getDelimitation().contains(e.getX(), e.getY());
   }
 
   @Override
@@ -103,10 +195,18 @@ public class EtatJeuGrille extends Etats {
     for (Bouton b : boutons) {
       b.setSourisSurvol(contient(e, b));
     }
+    sliderZoom.setSourisSurvol(contientSliderZoom(e));
+    slider.setSourisSurvol(contientSliderVitesse(e));
   }
 
   @Override
-  public void sourisGlissee(MouseEvent e) {}
+  public void sourisGlissee(MouseEvent e) {
+    if (sliderZoom.isEnGlissement()) {
+      sliderZoom.glisserVers(e.getY());
+    } else if (slider.isEnGlissement()) {
+      slider.glisserVers(e.getY());
+    }
+  }
 
   @Override
   public void sourisCliquee(MouseEvent e) {}
@@ -118,6 +218,13 @@ public class EtatJeuGrille extends Etats {
         b.setSourisEnfonce(true);
       }
     }
+    if (contientSliderZoom(e)) {
+      sliderZoom.setEnGlissement(true);
+      sliderZoom.glisserVers(e.getY());
+    } else if (contientSliderVitesse(e)) {
+      slider.setEnGlissement(true);
+      slider.glisserVers(e.getY());
+    }
   }
 
   @Override
@@ -128,17 +235,24 @@ public class EtatJeuGrille extends Etats {
       }
       b.setSourisEnfonce(false);
     }
+    sliderZoom.setEnGlissement(false);
+    slider.setEnGlissement(false);
   }
 
   private void afficherGrille(Graphics g) {
+    final int tc = tailleCellule;
+    g.setColor(Constants.COULEUR_CELLULE_VIVANTE);
 
-    for (int x = 0; x < maxX; x++) {
-      for (int y = 0; y < maxY; y++) {
-        if (jeuDeLaVie.getGrille(x, y).estVivante()) {
-          g.setColor(Color.WHITE);
-          g.fillRect(x * tailleCellule, y * tailleCellule, tailleCellule, tailleCellule);
+    int py = 0;
+    for (int y = 0; y < yMaxVis; y++) {
+      int px = 0;
+      for (int x = 0; x < xMaxVis; x++) {
+        if (jeuDeLaVie.estCelluleVivante(x, y)) {
+          g.fillRect(px, py, tc, tc);
         }
+        px += tc;
       }
+      py += tc;
     }
   }
 }

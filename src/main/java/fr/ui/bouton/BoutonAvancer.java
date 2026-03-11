@@ -1,26 +1,27 @@
-package fr.ui;
+package fr.ui.bouton;
 
+import fr.jeu.JeuDeLaVie;
 import fr.utilz.Constants;
-import java.awt.Color;
 import java.awt.Font;
 import java.awt.FontMetrics;
 import java.awt.Graphics;
 
-public class BoutonPause extends Bouton {
+public class BoutonAvancer extends Bouton {
+
   private static final Font FONT_LABEL = new Font("Arial", Font.BOLD, 16);
-  private boolean etat;
+  private JeuDeLaVie jeu;
   private final String label;
 
-  public BoutonPause(int x, int y, int largeur, int hauteur, boolean etatDefaut, String label) {
+  public BoutonAvancer(int x, int y, int largeur, int hauteur, String label, JeuDeLaVie jeu) {
     super(x, y, largeur, hauteur);
-    etat = etatDefaut;
     this.label = label;
+    this.jeu = jeu;
   }
 
   @Override
   public void dessiner(Graphics g) {
     super.dessiner(g);
-    g.setColor(Color.BLACK);
+    g.setColor(Constants.COULEUR_TEXTE);
     g.setFont(FONT_LABEL);
     FontMetrics fm = g.getFontMetrics();
     int lw = fm.stringWidth(label);
@@ -31,8 +32,7 @@ public class BoutonPause extends Bouton {
 
   @Override
   public void appliquerAction() {
-    Constants.pause = !etat;
-    etat = Constants.pause;
+    if (!Constants.pause) return;
+    jeu.calculerGenerationSuivante();
   }
 }
-

@@ -1,5 +1,6 @@
-package fr.ui;
+package fr.ui.bouton;
 
+import fr.utilz.Constants;
 import java.awt.Color;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
@@ -29,9 +30,9 @@ public abstract class Bouton {
     this.hauteur = hauteur;
     creerDelimitation();
     couleursFond = new Color[3];
-    couleursFond[0] = new Color(200, 200, 200, 180);
-    couleursFond[1] = new Color(220, 220, 220, 180);
-    couleursFond[2] = new Color(240, 240, 240, 180);
+    couleursFond[0] = Constants.COULEUR_BOUTON_NORMAL;
+    couleursFond[1] = Constants.COULEUR_BOUTON_SURVOL;
+    couleursFond[2] = Constants.COULEUR_BOUTON_ENFONCE;
   }
 
   protected void creerDelimitation() {
@@ -47,7 +48,7 @@ public abstract class Bouton {
     int idx = sourisSurvol ? (sourisEnfonce ? 2 : 1) : 0;
     g2d.setColor(couleursFond[idx]);
     g2d.fill(rect);
-    g2d.setColor(Color.GRAY);
+    g2d.setColor(Constants.COULEUR_BOUTON_BORDURE);
     g2d.draw(rect);
   }
 

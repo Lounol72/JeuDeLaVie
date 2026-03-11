@@ -4,7 +4,7 @@ import java.awt.event.MouseEvent;
 import java.util.ArrayList;
 
 import fr.game.Game;
-import fr.ui.Bouton;
+import fr.ui.bouton.Bouton;
 import fr.utilz.Constants;
 
 /** Base abstraite pour tous les écrans/états du jeu (menu, grille, paramètres). */

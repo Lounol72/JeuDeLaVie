@@ -9,6 +9,7 @@ import fr.game.Game;
 import fr.jeu.FenetreJeu;
 import fr.jeu.JeuDeLaVie;
 import fr.jeu.PanelJeu;
+import fr.utilz.Constants;
 import fr.visiteur.VisiteurClassique;
 import java.awt.Graphics;
 import java.util.EnumMap;
@@ -23,7 +24,9 @@ public class JeuDeLaVieUi implements Runnable, Observateur, Game {
   private final JeuDeLaVie jeu;
 
   private static final int TARGET_UPS = 60;
-  private static final int TARGET_FPS = 60;
+  private static final int TARGET_FPS_ACTIF = 60;
+  /** FPS réduit quand écran statique (menu, paramètres, pause) pour économiser le CPU. */
+  private static final int TARGET_FPS_IDLE = 15;
 
   private int fpsActuel = 0;
   private int upsActuel = 0;
@@ -37,7 +40,7 @@ public class JeuDeLaVieUi implements Runnable, Observateur, Game {
 
   public JeuDeLaVieUi(final JeuDeLaVie jeu) {
     this.jeu = jeu;
-    jeu.initVisiteur(new VisiteurClassique(jeu));
+    jeu.initVisiteur(VisiteurClassique.getInstance(jeu));
 
     menu = new Menu(this);
     etatsParEnum.put(EtatJeu.MENU, menu);
@@ -88,6 +91,13 @@ public class JeuDeLaVieUi implements Runnable, Observateur, Game {
     getEtatCourant().mettreAJour();
   }
 
+  /** Retourne true si on a besoin de 60 FPS (grille en cours de simulation). */
+  private boolean besoinFpsComplet() {
+    EtatJeu e = EtatJeu.getEtatActuel();
+    if (e != EtatJeu.GRILLE) return false;
+    return !Constants.pause;
+  }
+
   public void afficher(Graphics g) {
     getEtatCourant().dessiner(g);
   }
@@ -124,7 +134,8 @@ public class JeuDeLaVieUi implements Runnable, Observateur, Game {
         flagRepaint = false;
       }
 
-      long nanosParImage = 1_000_000_000L / TARGET_FPS;
+      int fpsCible = besoinFpsComplet() ? TARGET_FPS_ACTIF : TARGET_FPS_IDLE;
+      long nanosParImage = 1_000_000_000L / fpsCible;
       long dureeImage = System.nanoTime() - tempsActuel;
       long tempsRepos = (nanosParImage - dureeImage) / 1_000_000;
       if (tempsRepos > 0) {

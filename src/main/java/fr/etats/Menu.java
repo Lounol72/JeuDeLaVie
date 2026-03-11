@@ -1,14 +1,13 @@
 package fr.etats;
 
-import java.awt.Color;
 import java.awt.Graphics;
 import java.awt.event.KeyEvent;
 import java.awt.event.MouseEvent;
 import java.util.ArrayList;
 
 import fr.game.Game;
-import fr.ui.Bouton;
-import fr.ui.BoutonChangeurEtat;
+import fr.ui.bouton.Bouton;
+import fr.ui.bouton.BoutonChangeurEtat;
 import fr.utilz.Constants;
 
 /** État menu principal : boutons Jouer, Paramètres, Quitter. */
@@ -51,7 +50,7 @@ public class Menu extends Etats {
   @Override
   public void dessiner(Graphics g) {
     appliquerDispositionSiNecessaire();
-    g.setColor(Color.DARK_GRAY);
+    g.setColor(Constants.COULEUR_FOND_MENU);
     g.fillRect(0, 0, Constants.jeu_largeur, Constants.jeu_hauteur);
     for (Bouton b : boutons) {
       b.dessiner(g);

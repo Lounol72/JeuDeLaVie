@@ -1,26 +1,35 @@
 package fr.etats;
 
-import java.awt.Color;
 import java.awt.Graphics;
 import java.awt.event.KeyEvent;
 import java.awt.event.MouseEvent;
 import java.util.ArrayList;
 
 import fr.game.Game;
-import fr.ui.Bouton;
-import fr.ui.BoutonChangeurEtat;
+import fr.ui.bouton.Bouton;
+import fr.ui.bouton.BoutonChangeurEtat;
+import fr.ui.bouton.BoutonToggleTerminal;
 import fr.utilz.Constants;
 
-/** État paramètres (stub) : bouton Retour. */
+/** État paramètres : bouton Terminal, bouton Retour. */
 public class Parametres extends Etats {
 
-  private static final int LARGEUR_BOUTON = 200;
-  private static final int HAUTEUR_BOUTON = 44;
+  private static final int LARGEUR_BOUTON = 400;
+  private static final int HAUTEUR_BOUTON = 55;
+  private static final int ESPACEMENT = 64;
 
   public Parametres(Game jeu) {
     super(jeu);
     boutons = new ArrayList<>();
-    boutons.add(new BoutonChangeurEtat(50, Constants.jeu_hauteur - 130, LARGEUR_BOUTON, HAUTEUR_BOUTON, EtatJeu.MENU, "Retour"));
+    int cx = Constants.jeu_largeur / 2;
+    int cy = Constants.jeu_hauteur / 2 - 100;
+    int bw = Math.min(LARGEUR_BOUTON, Constants.jeu_largeur / 2);
+    boutons.add(
+        new BoutonToggleTerminal(
+            cx - bw / 2, cy, bw, HAUTEUR_BOUTON, jeu.getJeuDeLaVie()));
+    boutons.add(
+        new BoutonChangeurEtat(
+            cx - bw / 2, cy + ESPACEMENT, bw, HAUTEUR_BOUTON, EtatJeu.MENU, "Retour"));
   }
 
   @Override
@@ -28,13 +37,17 @@ public class Parametres extends Etats {
 
   @Override
   protected void appliquerDisposition(int largeur, int hauteur) {
-    boutons.get(0).setBounds(50, hauteur - 130, LARGEUR_BOUTON, HAUTEUR_BOUTON);
+    int cx = largeur / 2;
+    int cy = hauteur / 2 - 100;
+    int bw = Math.min(LARGEUR_BOUTON, largeur / 2);
+    boutons.get(0).setBounds(cx - bw / 2, cy, bw, HAUTEUR_BOUTON);
+    boutons.get(1).setBounds(cx - bw / 2, cy + ESPACEMENT, bw, HAUTEUR_BOUTON);
   }
 
   @Override
   public void dessiner(Graphics g) {
     appliquerDispositionSiNecessaire();
-    g.setColor(Color.GRAY);
+    g.setColor(Constants.COULEUR_FOND_PARAMETRES);
     g.fillRect(0, 0, Constants.jeu_largeur, Constants.jeu_hauteur);
     for (Bouton b : boutons) {
       b.dessiner(g);
