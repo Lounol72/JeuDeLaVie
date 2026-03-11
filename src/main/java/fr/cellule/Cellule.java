@@ -1,6 +1,7 @@
 package fr.cellule;
 
 import fr.jeu.JeuDeLaVie;
+import fr.visiteur.Visiteur;
 
 public class Cellule {
   private CelluleEtat etat;
@@ -40,29 +41,37 @@ public class Cellule {
   }
 
   public int nbVoisinsVivants(JeuDeLaVie jeuDeLaVie) {
-    int count = 0;
+    int compteur = 0;
+    int maxX = jeuDeLaVie.getMaxX();
+    int maxY = jeuDeLaVie.getMaxY();
     for (int dx = -1; dx <= 1; dx++) {
       for (int dy = -1; dy <= 1; dy++) {
         if (dx == 0 && dy == 0) {
           continue;
-        } // on ne vérifie la cellule elle-même
-        // On vérifie si le voisin est trop grand ou petit
-        if (posX + dx < 0
-            || posX + dx > jeuDeLaVie.getMaxX()
-            || posY + dy < 0
-            || posY + dy > jeuDeLaVie.getMaxY()) {
+        }
+        int nx = posX + dx;
+        int ny = posY + dy;
+        if (nx < 0 || nx >= maxX || ny < 0 || ny >= maxY) {
           continue;
         }
-        if (jeuDeLaVie.getGrille(posX + dx, posY + dy).estVivante()) {
-          count++;
+        if (jeuDeLaVie.getGrille(nx, ny).estVivante()) {
+          compteur++;
         }
       }
     }
-    return count;
+    return compteur;
   }
 
   @Override
   public String toString() {
     return "Cellule " + posX + "|" + posY + "est " + (estVivante() ? "vivante" : "morte");
+  }
+
+  public void accepte(Visiteur visiteur) {
+    if (estVivante()) {
+      visiteur.visiteCelluleVivante(this);
+    } else {
+      visiteur.visiteCelluleMorte(this);
+    }
   }
 }

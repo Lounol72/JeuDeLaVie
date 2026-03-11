@@ -1,37 +1,49 @@
 package fr.jeu;
 
+import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.awt.event.WindowFocusListener;
 
 import javax.swing.JFrame;
 
-import fr.ui.JeuDeLaVieUi;
+import fr.game.Game;
 
-/** Fenêtre principale (JFrame) : contient le GamePanel, gère fermeture (sauvegarde) et focus. */
+/** Fenêtre principale (JFrame) : contient le panneau, gère fermeture directe. */
 public class FenetreJeu extends JFrame {
 
   private static final long serialVersionUID = 1L;
+  private final Game jeu;
 
-  public FenetreJeu(PanelJeu gamePanel, JeuDeLaVieUi game) {
+  public FenetreJeu(PanelJeu panneauJeu, Game jeu) {
+    this.jeu = jeu;
     setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
-    add(gamePanel);
-    setTitle("GL2 Projet");
+    add(panneauJeu);
+    setTitle("Jeu de la Vie");
     setLocationRelativeTo(null);
     setResizable(true);
     pack();
     setVisible(true);
 
+    addWindowListener(
+        new WindowAdapter() {
+          @Override
+          public void windowClosing(WindowEvent e) {
+            gererFermeture();
+          }
+        });
+
     addWindowFocusListener(
         new WindowFocusListener() {
           @Override
-          public void windowGainedFocus(WindowEvent e) {
-            System.out.println("Window gained focus");
-          }
+          public void windowGainedFocus(WindowEvent e) {}
 
           @Override
-          public void windowLostFocus(WindowEvent e) {
-            System.out.println("Window lost focus");
-          }
+          public void windowLostFocus(WindowEvent e) {}
         });
+  }
+
+  public void gererFermeture() {
+    jeu.nettoyer();
+    System.exit(0);
   }
 }

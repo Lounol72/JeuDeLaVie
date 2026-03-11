@@ -4,12 +4,11 @@ import fr.cellule.Cellule;
 
 public class CommandeMeurt extends Commande {
 
-  /** */
   public CommandeMeurt(Cellule c) {
     this.cellule = c;
   }
 
-  public void execute() {
+  public void executer() {
     cellule.meurt();
   }
 }

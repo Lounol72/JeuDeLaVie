@@ -51,3 +51,16 @@ Dans ce DP, un "client" instancie des commandes destinées à un receveur, et un
 La cinquième étape consiste à écrire les règles du jeu en utilisant le DP "Visiteur". Un visiteur est une façon de séparer un algorithme d'une structure de données. Le client distribue un visiteur aux éléments, qui demandent à leur visiteur d'exécuter le traitement. Dans le diagramme ci-dessous, le client est le ***JeuDeLaVie***, les éléments sont des cellules, le visiteur est ***VisiteurClassique***. La métode  _distribueVisiteur_ invoque la méthode _accepte_ de toutes les cellules, lesquelles invoquent la méthode accepe de leur état(délégation). Enfin, ce dernier invoque la méthode du visiteur (visiteCelluleVivante ou visiteCelluleMorte), laquelle va instancier et ajouter une nouvelle commande (CommandeVit ou CommandeMeurt selon l'environment de la cellule) dans la fille d'attente de commandes du jeu.
 
 ![Visiteur Diagramme](docs/Visiteur.png "Visiteur")
+
+# 6. Extensions et améliorations
+
+Pour cette sixième étape nous devons créer au moins faire :
+- Un deuxième visiteur qui se contente d'afficher dans la console Java le numéro de la génération courante et le nombre de cellules actuellement en vie.
+- Ajouter des visiteur qui implémentent des règles alternatives comme HighLife, Day & Night, etc.
+- Ecrire une interface graphique qui comporte un certain nombre de commandes :
+    - Bouton pour exécuter/arrêter la boucle d'éxecution;
+    - Bouton pour avancer d'une génération lorsque la boucle est arrêter;
+    - Slider pour ajouter la vitesse de la boucle d'exécution;
+    - Contrôle de sectuibs des règles du jeu, etc.
+
+Pour commencer j'ai ajouter le DP "Etat" afin de gérer un menu de présentation, ainsi que des paramètres et le jeu en lui même, ce qui nous permettra plus tard d'ajouter des boutons pour contrôler les rêgles du jeu. J'ai aussi ajouter le fait que nous pouvons configurer les cellules lorsqu'elles sont en pause, ce qui permet donc de faire une configuration de départ, ou permet de la modifier " à la volée". J'ai aussi ajouter un système de zoom sur la grille, la taille de la grille personnalisable, ce qui remettra à 0 la grille si elle est déjà initialisé. Je controlerai aussi la taille des cellules.

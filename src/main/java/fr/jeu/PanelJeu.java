@@ -1,8 +1,8 @@
 package fr.jeu;
 
+import fr.game.Game;
 import fr.inputs.IClavier;
 import fr.inputs.ISouris;
-import fr.ui.JeuDeLaVieUi;
 import fr.utilz.Constants;
 import java.awt.Dimension;
 import java.awt.Graphics;
@@ -11,29 +11,30 @@ import java.awt.event.ComponentEvent;
 import javax.swing.JPanel;
 
 public class PanelJeu extends JPanel {
-  private final ISouris mouseInputs;
-  private final JeuDeLaVieUi jeu;
 
-  public PanelJeu(JeuDeLaVieUi jeu) {
-    this.mouseInputs = new ISouris(this);
+  private final ISouris entreesSouris;
+  private final Game jeu;
+
+  public PanelJeu(Game jeu) {
+    this.entreesSouris = new ISouris(this);
     this.jeu = jeu;
 
-    Constants.jeu_largeur = 1920;
-    Constants.jeu_hauteur = 1080;
+    Constants.jeu_largeur = 1280;
+    Constants.jeu_hauteur = 720;
     setPanelSize();
     addResizeListener();
     addKeyListener(new IClavier(this));
-    addMouseListener(mouseInputs);
-    addMouseMotionListener(mouseInputs);
+    addMouseListener(entreesSouris);
+    addMouseMotionListener(entreesSouris);
   }
 
   @Override
   public void paintComponent(Graphics g) {
     super.paintComponent(g);
-    jeu.render(g);
+    jeu.getEtatCourant().dessiner(g);
   }
 
-  public JeuDeLaVieUi getGame() {
+  public Game getJeu() {
     return this.jeu;
   }
 
@@ -46,11 +47,11 @@ public class PanelJeu extends JPanel {
         new ComponentAdapter() {
           @Override
           public void componentResized(ComponentEvent e) {
-            int w = getWidth();
-            int h = getHeight();
-            if (w > 0 && h > 0) {
-              Constants.jeu_largeur = w;
-              Constants.jeu_hauteur = h;
+            int largeur = getWidth();
+            int hauteur = getHeight();
+            if (largeur > 0 && hauteur > 0) {
+              Constants.jeu_largeur = largeur;
+              Constants.jeu_hauteur = hauteur;
             }
           }
         });

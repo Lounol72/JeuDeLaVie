@@ -1,0 +1,24 @@
+package fr.visiteur;
+
+import fr.cellule.Cellule;
+import fr.commande.CommandeMeurt;
+import fr.commande.CommandeVit;
+import fr.jeu.JeuDeLaVie;
+
+public class VisiteurClassique extends Visiteur {
+
+  public VisiteurClassique(JeuDeLaVie jeu) {
+    super(jeu);
+  }
+
+  public void visiteCelluleVivante(Cellule c) {
+    int voisins = c.nbVoisinsVivants(jeu);
+    if (voisins < 2 || voisins > 3) jeu.ajouteCommande(new CommandeMeurt(c));
+  }
+
+  public void visiteCelluleMorte(Cellule c) {
+    int voisins = c.nbVoisinsVivants(jeu);
+    if (voisins == 3) jeu.ajouteCommande(new CommandeVit(c));
+  }
+}
+

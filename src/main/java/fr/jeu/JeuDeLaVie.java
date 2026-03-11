@@ -6,6 +6,7 @@ import fr.cellule.CelluleEtatVivant;
 import fr.commande.Commande;
 import fr.ui.Observable;
 import fr.ui.Observateur;
+import fr.visiteur.Visiteur;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
@@ -17,17 +18,21 @@ import java.util.Random;
  */
 public class JeuDeLaVie implements Observable {
   private Cellule[][] grille;
-  private List<Commande> commandes;
   private int maxX;
   private int maxY;
 
-  // Observateurs :
   private List<Observateur> observateurs;
+  private List<Commande> commandes;
+  private Visiteur visiteur = null;
 
   /** Constructeur du jeu de la vie, initialise le jeu avec les variables par "Défaut". */
   public JeuDeLaVie() {
-    maxX = 10;
-    maxY = 10;
+    maxX = 2000;
+    maxY = 1000;
+    initClasses();
+  }
+
+  private void initClasses() {
     observateurs = new ArrayList<>();
     commandes = new ArrayList<>();
   }
@@ -66,11 +71,11 @@ public class JeuDeLaVie implements Observable {
     if (x < 0 || x >= maxX) {
       throw new IndexOutOfBoundsException("Index " + x + " out of bounds for size " + maxX);
     }
-    if (y < 0 || x >= maxY) {
+    if (y < 0 || y >= maxY) {
       throw new IndexOutOfBoundsException("Index " + y + " out of bounds for size " + maxY);
     }
 
-    return new Cellule(grille[x][y]);
+    return grille[x][y];
   }
 
   public void ajouteCommande(Commande c) {
@@ -80,6 +85,20 @@ public class JeuDeLaVie implements Observable {
   public void executeCommandes() {
     commandes.forEach(Commande::executer);
     commandes.clear();
+  }
+
+  public void distribueVisiteur() {
+    for (Cellule[] list : grille) {
+      for (Cellule cellule : list) {
+        cellule.accepte(visiteur);
+      }
+    }
+  }
+
+  public void calculerGenerationSuivante() {
+    distribueVisiteur();
+    executeCommandes();
+    notifieObservateur();
   }
 
   @Override
@@ -117,5 +136,13 @@ public class JeuDeLaVie implements Observable {
     for (Observateur o : observateurs) {
       o.actualise();
     }
+  }
+
+  public void initVisiteur(Visiteur v) {
+    if (visiteur != null) {
+      System.out.println("Visiteur déjà initialisé");
+      return;
+    }
+    visiteur = v;
   }
 }
