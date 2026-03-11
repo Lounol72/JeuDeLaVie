@@ -7,7 +7,7 @@ public class App {
 
   public static void main(String[] args) {
     JeuDeLaVie jeu = new JeuDeLaVie();
-    jeu.initialseGrille();
+    jeu.initialiseGrille();
     JeuDeLaVieUi ui = new JeuDeLaVieUi(jeu);
     jeu.attacheObservateur(ui);
   }

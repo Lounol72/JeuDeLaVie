@@ -10,7 +10,8 @@ import fr.jeu.FenetreJeu;
 import fr.jeu.JeuDeLaVie;
 import fr.jeu.PanelJeu;
 import fr.utilz.Constants;
-import fr.visiteur.VisiteurClassique;
+import fr.visiteur.TypeVisiteur;
+import fr.visiteur.VisiteurFactory;
 import java.awt.Graphics;
 import java.util.EnumMap;
 import java.util.Map;
@@ -40,7 +41,8 @@ public class JeuDeLaVieUi implements Runnable, Observateur, Game {
 
   public JeuDeLaVieUi(final JeuDeLaVie jeu) {
     this.jeu = jeu;
-    jeu.initVisiteur(VisiteurClassique.getInstance(jeu));
+    jeu.initVisiteur(VisiteurFactory.creer(TypeVisiteur.CLASSIQUE, jeu));
+    jeu.setTypeVisiteurActif(TypeVisiteur.CLASSIQUE);
 
     menu = new Menu(this);
     etatsParEnum.put(EtatJeu.MENU, menu);

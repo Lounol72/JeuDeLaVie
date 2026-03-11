@@ -1,18 +1,27 @@
 package fr.ui.bouton;
 
 import fr.jeu.JeuDeLaVie;
-import fr.utilz.Constants;
-import java.awt.Font;
-import java.awt.FontMetrics;
 import java.awt.Graphics;
 
-/** Bouton toggle pour activer/désactiver l'affichage terminal (stats console). */
+/**
+ * Bouton bascule pour activer ou désactiver l'affichage des statistiques en console.
+ *
+ * <p>Le libellé reflète l'état courant du terminal : {@code "Terminal: On"} ou
+ * {@code "Terminal: Off"}.
+ */
 public class BoutonToggleTerminal extends Bouton {
-
-  private static final Font FONT_LABEL = new Font("Arial", Font.BOLD, 16);
 
   private final JeuDeLaVie jeu;
 
+  /**
+   * Crée un bouton de bascule du terminal console.
+   *
+   * @param x       position horizontale en pixels
+   * @param y       position verticale en pixels
+   * @param largeur largeur du bouton en pixels
+   * @param hauteur hauteur du bouton en pixels
+   * @param jeu     instance du jeu dont on contrôle le terminal
+   */
   public BoutonToggleTerminal(int x, int y, int largeur, int hauteur, JeuDeLaVie jeu) {
     super(x, y, largeur, hauteur);
     this.jeu = jeu;
@@ -21,14 +30,9 @@ public class BoutonToggleTerminal extends Bouton {
   @Override
   public void dessiner(Graphics g) {
     super.dessiner(g);
-    g.setColor(Constants.COULEUR_TEXTE);
-    g.setFont(FONT_LABEL);
+    // Le libellé est dynamique : il reflète l'état courant du terminal
     String label = jeu.isTerminalActif() ? "Terminal: On" : "Terminal: Off";
-    FontMetrics fm = g.getFontMetrics();
-    int lw = fm.stringWidth(label);
-    int lx = x + (largeur - lw) / 2;
-    int ly = y + (hauteur + fm.getAscent()) / 2 - 2;
-    g.drawString(label, lx, ly);
+    dessinerLabel(g, label);
   }
 
   @Override

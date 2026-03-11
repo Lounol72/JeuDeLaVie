@@ -66,3 +66,55 @@ Pour cette sixième étape nous devons créer au moins faire :
 Pour commencer j'ai ajouter le DP "Etat" afin de gérer un menu de présentation, ainsi que des paramètres et le jeu en lui même, ce qui nous permettra plus tard d'ajouter des boutons pour contrôler les rêgles du jeu. J'ai aussi ajouter le fait que nous pouvons configurer les cellules lorsqu'elles sont en pause, ce qui permet donc de faire une configuration de départ, ou permet de la modifier " à la volée". J'ai aussi ajouter un système de zoom sur la grille, la taille de la grille personnalisable, ce qui remettra à 0 la grille si elle est déjà initialisé. Je controlerai aussi la taille des cellules.
 
 Pour se faire j'ai implémenter le pattern Singleton aux visiteurs, car nous n'avons aucunement besoin de plusieurs instance.
+
+# 7. Refactoring OOP — Remplacement des Singletons paramétrés par une Factory
+
+## Pourquoi le Singleton paramétré est un anti-pattern
+
+Les visiteurs de règles (`VisiteurClassique`, `VisiteurHighLife`, `VisiteurDayNight`) étaient
+initialement implémentés comme des Singletons avec une signature `getInstance(JeuDeLaVie jeu)`.
+Cette combinaison constitue un anti-pattern pour plusieurs raisons :
+
+
+**1. Le Singleton est injustifié ici**
+
+Le Singleton se justifie quand une classe n'a *vraiment* pas d'état propre (ex. : `CelluleEtatVivant`,
+`CelluleEtatMort` qui sont des marqueurs purs). Les visiteurs de règles, eux, reçoivent un
+`JeuDeLaVie` en dépendance — ils ont un état contextuel. Partager une instance unique avec un état
+partagé introduit un couplage inutile.
+
+**2. Les tests deviennent fragiles**
+
+Avec un Singleton, les tests partagent l'instance entre méthodes. L'ordre d'exécution devient
+important, les mocks peuvent "fuir" d'un test à l'autre, et `@BeforeAll` masque le problème
+sans le résoudre.
+
+## Solution : Factory Method
+
+Un `VisiteurFactory` centralise la création des visiteurs :
+
+```java
+public class VisiteurFactory {
+    public static Visiteur creer(TypeVisiteur type, JeuDeLaVie jeu) {
+        switch (type) {
+            case HIGH_LIFE:  return new VisiteurHighLife(jeu);
+            case DAY_NIGHT:  return new VisiteurDayNight(jeu);
+            default:         return new VisiteurClassique(jeu);
+        }
+    }
+}
+```
+
+**Avantages :**
+- Chaque appel retourne une instance fraîche liée au bon `JeuDeLaVie` → pas d'effet de bord
+- Point d'extension unique : ajouter un visiteur ne touche que la factory et l'enum `TypeVisiteur`
+- Tests isolés : chaque test crée sa propre instance via `new VisiteurXxx(mockJeu)`
+
+## Autres améliorations apportées
+
+| Pattern | Avant | Après |
+|---|---|---|
+| **Strategy** | Implicite (classe abstraite `Visiteur`) | Interface `RegleJeu` explicite — le contrat est nommé |
+| **Decorator** | `VisiteurTerminal` appliqué en boucle séparée | `VisiteurTerminal` enveloppe la règle active et lui délègue |
+| **Adapter** | Classes nommées `ISouris`, `IClavier` (préfixe trompeur) | `AdaptateurSouris`, `AdaptateurClavier` — rôle évident |
+| **Visibilité mémoire** | `Constants.pause`, `EtatJeu.etatActuel` non-`volatile` | `volatile` ajouté pour garantir la visibilité entre threads |

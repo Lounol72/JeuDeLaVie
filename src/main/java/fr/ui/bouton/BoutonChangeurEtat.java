@@ -1,20 +1,28 @@
 package fr.ui.bouton;
 
-import fr.utilz.Constants;
-import java.awt.Font;
-import java.awt.FontMetrics;
+import fr.etats.EtatJeu;
 import java.awt.Graphics;
 
-import fr.etats.EtatJeu;
-
-/** Bouton permettant de changer l'état du jeu. */
+/**
+ * Bouton de navigation permettant de changer l'état courant du jeu (ex. Menu → Grille).
+ *
+ * <p>Au clic, délègue la transition d'état à {@link EtatJeu#setEtatActuel(EtatJeu)}.
+ */
 public class BoutonChangeurEtat extends Bouton {
-
-  private static final Font FONT_LABEL = new Font("Arial", Font.BOLD, 16);
 
   private final EtatJeu action;
   private final String label;
 
+  /**
+   * Crée un bouton de changement d'état.
+   *
+   * @param x       position horizontale en pixels
+   * @param y       position verticale en pixels
+   * @param largeur largeur du bouton en pixels
+   * @param hauteur hauteur du bouton en pixels
+   * @param action  état cible à activer au clic
+   * @param label   texte affiché sur le bouton
+   */
   public BoutonChangeurEtat(int x, int y, int largeur, int hauteur, EtatJeu action, String label) {
     super(x, y, largeur, hauteur);
     this.action = action;
@@ -24,13 +32,7 @@ public class BoutonChangeurEtat extends Bouton {
   @Override
   public void dessiner(Graphics g) {
     super.dessiner(g);
-    g.setColor(Constants.COULEUR_TEXTE);
-    g.setFont(FONT_LABEL);
-    FontMetrics fm = g.getFontMetrics();
-    int lw = fm.stringWidth(label);
-    int lx = x + (largeur - lw) / 2;
-    int ly = y + (hauteur + fm.getAscent()) / 2 - 2;
-    g.drawString(label, lx, ly);
+    dessinerLabel(g, label);
   }
 
   @Override

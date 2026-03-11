@@ -1,8 +1,8 @@
 package fr.jeu;
 
 import fr.game.Game;
-import fr.inputs.IClavier;
-import fr.inputs.ISouris;
+import fr.inputs.AdaptateurClavier;
+import fr.inputs.AdaptateurSouris;
 import fr.utilz.Constants;
 import java.awt.Dimension;
 import java.awt.Graphics;
@@ -12,20 +12,21 @@ import javax.swing.JPanel;
 
 public class PanelJeu extends JPanel {
 
-  private final ISouris entreesSouris;
+  private final AdaptateurSouris entreesSouris;
   private final Game jeu;
 
   public PanelJeu(Game jeu) {
-    this.entreesSouris = new ISouris(this);
+    this.entreesSouris = new AdaptateurSouris(this);
     this.jeu = jeu;
 
     Constants.jeu_largeur = 1280;
     Constants.jeu_hauteur = 720;
     setPanelSize();
     addResizeListener();
-    addKeyListener(new IClavier(this));
+    addKeyListener(new AdaptateurClavier(this));
     addMouseListener(entreesSouris);
     addMouseMotionListener(entreesSouris);
+    addMouseWheelListener(entreesSouris);
   }
 
   @Override

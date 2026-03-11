@@ -2,14 +2,26 @@ package fr.ui.bouton;
 
 import fr.utilz.Constants;
 import java.awt.Color;
+import java.awt.Font;
+import java.awt.FontMetrics;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.Rectangle;
 import java.awt.RenderingHints;
 import java.awt.geom.RoundRectangle2D;
 
-/** Base abstraite pour les boutons UI : position, zone de clic, survol/enfoncement. */
+/**
+ * Classe de base abstraite pour tous les boutons de l'interface utilisateur.
+ *
+ * <p>Gère la géométrie (position et dimensions), les états visuels (normal, survol, enfoncé)
+ * et fournit un rendu de fond arrondi commun. Les sous-classes implémentent
+ * {@link #appliquerAction()} et appellent {@link #dessinerLabel(Graphics, String)} pour
+ * afficher leur libellé sans dupliquer la logique de centrage.
+ */
 public abstract class Bouton {
+
+  /** Police partagée par tous les boutons (Arial gras 16pt). */
+  protected static final Font FONT_LABEL = new Font("Arial", Font.BOLD, 16);
 
   protected int x;
   protected int y;
@@ -115,5 +127,24 @@ public abstract class Bouton {
 
   public void setSourisSurvol(boolean sourisSurvol) {
     this.sourisSurvol = sourisSurvol;
+  }
+
+  /**
+   * Dessine un libellé texte centré horizontalement et verticalement dans les limites du bouton.
+   *
+   * <p>Utilise {@link #FONT_LABEL} et la couleur {@code Constants.COULEUR_TEXTE}. Cette méthode
+   * doit être appelée depuis {@link #dessiner(Graphics)} des sous-classes, après le rendu du fond.
+   *
+   * @param g     le contexte graphique courant
+   * @param label le texte à afficher
+   */
+  protected void dessinerLabel(Graphics g, String label) {
+    g.setColor(Constants.COULEUR_TEXTE);
+    g.setFont(FONT_LABEL);
+    FontMetrics fm = g.getFontMetrics();
+    int lw = fm.stringWidth(label);
+    int lx = x + (largeur - lw) / 2;
+    int ly = y + (hauteur + fm.getAscent()) / 2 - 2;
+    g.drawString(label, lx, ly);
   }
 }

@@ -7,8 +7,8 @@ public enum EtatJeu {
   PARAMETRES,
   QUITTER;
 
-  private static EtatJeu etatActuel = MENU;
-  private static EtatJeu etatPrecedent = MENU;
+  private static volatile EtatJeu etatActuel = MENU;
+  private static volatile EtatJeu etatPrecedent = MENU;
 
   public static EtatJeu getEtatPrecedent() {
     return etatPrecedent;

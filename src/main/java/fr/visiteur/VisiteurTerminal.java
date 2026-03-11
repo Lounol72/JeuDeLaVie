@@ -3,39 +3,46 @@ package fr.visiteur;
 import fr.cellule.Cellule;
 import fr.jeu.JeuDeLaVie;
 
+/**
+ * Décorateur d'observation (Decorator pattern).
+ *
+ * <p>Enveloppe n'importe quelle {@link RegleJeu} et délègue le traitement des cellules
+ * à la règle décorée, tout en comptant les cellules vivantes à des fins de reporting console.
+ */
 public class VisiteurTerminal extends Visiteur {
 
-  private static volatile VisiteurTerminal instance = null;
+  private RegleJeu regleDecoree;
   private int cpt = 0;
-  private static int generations = 0;
+  private int generations = 0;
 
-  private VisiteurTerminal(JeuDeLaVie jeu) {
+  public VisiteurTerminal(JeuDeLaVie jeu, RegleJeu regleDecoree) {
     super(jeu);
+    this.regleDecoree = regleDecoree;
   }
 
-  public static VisiteurTerminal getInstance(JeuDeLaVie jeu) {
-    if (instance != null) {
-      return instance;
-    }
-    synchronized (VisiteurTerminal.class) {
-      if (instance == null) {
-        instance = new VisiteurTerminal(jeu);
-      }
-      return instance;
-    }
+  public void setRegleDecoree(RegleJeu regle) {
+    this.regleDecoree = regle;
   }
 
+  @Override
   public void visiteCelluleVivante(Cellule c) {
+    regleDecoree.visiteCelluleVivante(c);
     cpt++;
   }
 
+  @Override
   public void visiteCelluleMorte(Cellule c) {
-    return;
+    regleDecoree.visiteCelluleMorte(c);
   }
 
   public void nouvelleGeneration() {
     cpt = 0;
     generations++;
+  }
+
+  public void reinitialiserCompteur() {
+    cpt = 0;
+    generations = 0;
   }
 
   @Override

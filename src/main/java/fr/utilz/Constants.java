@@ -5,7 +5,7 @@ import java.awt.Color;
 public class Constants {
   public static int jeu_largeur = 0;
   public static int jeu_hauteur = 0;
-  public static boolean pause = false;
+  public static volatile boolean pause = false;
 
   /** Palette UI : thème sombre avec accents verts (Jeu de la Vie). */
   public static final Color COULEUR_FOND_MENU = new Color(0x1a, 0x23, 0x32);

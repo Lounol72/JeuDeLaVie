@@ -1,7 +1,7 @@
 package fr.cellule;
 
 import fr.jeu.JeuDeLaVie;
-import fr.visiteur.Visiteur;
+import fr.visiteur.RegleJeu;
 
 public class Cellule {
   private CelluleEtat etat;
@@ -67,11 +67,11 @@ public class Cellule {
     return "Cellule " + posX + "|" + posY + "est " + (estVivante() ? "vivante" : "morte");
   }
 
-  public void accepte(Visiteur visiteur) {
+  public void accepte(RegleJeu regle) {
     if (estVivante()) {
-      visiteur.visiteCelluleVivante(this);
+      regle.visiteCelluleVivante(this);
     } else {
-      visiteur.visiteCelluleMorte(this);
+      regle.visiteCelluleMorte(this);
     }
   }
 }
