@@ -11,14 +11,8 @@ public abstract class Visiteur implements RegleJeu {
   }
 
   @Override
-  public void visiteCelluleVivante(Cellule c) {
-    throw new UnsupportedOperationException(
-        "Unimplemented method 'visiteCelluleVivante' for abstract class Visiteur");
-  }
+  public abstract void visiteCelluleVivante(Cellule c);
 
   @Override
-  public void visiteCelluleMorte(Cellule c) {
-    throw new UnsupportedOperationException(
-        "Unimplemented method 'visiteCelluleMorte' for abstract class Visiteur");
-  }
+  public abstract void visiteCelluleMorte(Cellule c);
 }

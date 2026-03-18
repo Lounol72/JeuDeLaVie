@@ -15,6 +15,7 @@ import fr.game.Game;
 import fr.ui.ComboBoxVisiteur;
 import fr.ui.bouton.Bouton;
 import fr.ui.bouton.BoutonChangeurEtat;
+import fr.ui.bouton.BoutonCouleur;
 import fr.ui.bouton.BoutonToggleCouleur;
 import fr.ui.bouton.BoutonToggleTerminal;
 import fr.ui.bouton.BoutonToggleTorique;
@@ -47,7 +48,8 @@ public class Parametres extends Etats {
   private static final int OFF_SEP2     = OFF_DESC + 36 + 14;
   private static final int OFF_H_OPT    = OFF_SEP2 + 1 + 14;
   private static final int OFF_TOGGLES  = OFF_H_OPT + 20 + 10;
-  private static final int OFF_SEP3     = OFF_TOGGLES + ELEM_H + 14;
+  private static final int OFF_COULEURS = OFF_TOGGLES + ELEM_H + 10;
+  private static final int OFF_SEP3     = OFF_COULEURS + ELEM_H + 14;
   private static final int OFF_RETOUR   = OFF_SEP3 + 1 + 14;
   private static final int CARD_H       = OFF_RETOUR + ELEM_H + 24;
 
@@ -90,30 +92,33 @@ public class Parametres extends Etats {
     BoutonToggleCouleur  couleur  = new BoutonToggleCouleur(0, 0, 0, 0, jeu.getJeuDeLaVie());
     BoutonToggleTorique  torique  = new BoutonToggleTorique(0, 0, 0, 0, jeu.getJeuDeLaVie());
     BoutonChangeurEtat   retour   = new BoutonChangeurEtat(0, 0, 0, 0, EtatJeu.MENU, "← Retour");
+    BoutonCouleur vivante = new BoutonCouleur(0, 0, 0, 0, "Cellule",
+        () -> Constants.COULEUR_CELLULE_VIVANTE,
+        c  -> Constants.COULEUR_CELLULE_VIVANTE = c);
+    BoutonCouleur fond = new BoutonCouleur(0, 0, 0, 0, "Fond",
+        () -> Constants.COULEUR_FOND_GRILLE,
+        c  -> Constants.COULEUR_FOND_GRILLE = c);
+    BoutonCouleur morte = new BoutonCouleur(0, 0, 0, 0, "Morte",
+        () -> Constants.COULEUR_CELLULE_MORTE,
+        c  -> Constants.COULEUR_CELLULE_MORTE = c);
     boutons.add(terminal);
     boutons.add(couleur);
     boutons.add(torique);
+    boutons.add(vivante);
+    boutons.add(fond);
+    boutons.add(morte);
     boutons.add(retour);
 
     enregistrer(comboVisiteur, (w, h) -> {
       int cw = cw(w); int cx = cx(w, cw); int cy = cy(h);
       return new int[]{ cx + CARD_PAD, cy + OFF_COMBO, cw - CARD_PAD * 2, ELEM_H };
     });
-    enregistrer(terminal, (w, h) -> {
-      int cw = cw(w); int cx = cx(w, cw); int cy = cy(h);
-      int bw = (cw - CARD_PAD * 2 - 2 * GAP_TOG) / 3;
-      return new int[]{ cx + CARD_PAD, cy + OFF_TOGGLES, bw, ELEM_H };
-    });
-    enregistrer(couleur, (w, h) -> {
-      int cw = cw(w); int cx = cx(w, cw); int cy = cy(h);
-      int bw = (cw - CARD_PAD * 2 - 2 * GAP_TOG) / 3;
-      return new int[]{ cx + CARD_PAD + bw + GAP_TOG, cy + OFF_TOGGLES, bw, ELEM_H };
-    });
-    enregistrer(torique, (w, h) -> {
-      int cw = cw(w); int cx = cx(w, cw); int cy = cy(h);
-      int bw = (cw - CARD_PAD * 2 - 2 * GAP_TOG) / 3;
-      return new int[]{ cx + CARD_PAD + 2 * (bw + GAP_TOG), cy + OFF_TOGGLES, bw, ELEM_H };
-    });
+    enregistrer(terminal, ligneToggle(0, OFF_TOGGLES));
+    enregistrer(couleur,  ligneToggle(1, OFF_TOGGLES));
+    enregistrer(torique,  ligneToggle(2, OFF_TOGGLES));
+    enregistrer(vivante,  ligneToggle(0, OFF_COULEURS));
+    enregistrer(fond,     ligneToggle(1, OFF_COULEURS));
+    enregistrer(morte,    ligneToggle(2, OFF_COULEURS));
     enregistrer(retour, (w, h) -> {
       int cw = cw(w); int cx = cx(w, cw); int cy = cy(h);
       return new int[]{ cx + CARD_PAD, cy + OFF_RETOUR, cw - CARD_PAD * 2, ELEM_H };
@@ -127,6 +132,20 @@ public class Parametres extends Etats {
   private static int cw(int w) { return Math.min(CARD_W, w - 60); }
   private static int cx(int w, int cw) { return (w - cw) / 2; }
   private static int cy(int h) { return (h - CARD_H) / 2; }
+
+  /**
+   * Retourne un {@link fr.ui.CalculBounds} pour un bouton dans la grille 3 colonnes de la card.
+   *
+   * @param col      indice de colonne (0, 1 ou 2)
+   * @param offsetY  décalage Y depuis le bord supérieur de la card
+   */
+  private static fr.ui.CalculBounds ligneToggle(int col, int offsetY) {
+    return (w, h) -> {
+      int cw = cw(w); int cx = cx(w, cw); int cy = cy(h);
+      int bw = (cw - CARD_PAD * 2 - 2 * GAP_TOG) / 3;
+      return new int[]{ cx + CARD_PAD + col * (bw + GAP_TOG), cy + offsetY, bw, ELEM_H };
+    };
+  }
 
   // -------------------------------------------------------------------------
   // Boucle
@@ -259,17 +278,13 @@ public class Parametres extends Etats {
     comboVisiteur.sourisEnfoncee(e.getX(), e.getY());
     // Le combo absorbe le clic quand il est ouvert (évite de déclencher les boutons derrière)
     if (comboEtaitOuvert) return;
-    for (Bouton b : boutons) { if (contient(e, b)) b.setSourisEnfonce(true); }
+    if (!comboEtaitOuvert) enfoncerBoutons(e);
   }
 
   @Override
   public void sourisRelachee(MouseEvent e) {
     boolean comboEtaitOuvert = comboVisiteur.isOuvert();
     comboVisiteur.sourisRelachee(e.getX(), e.getY());
-    if (comboEtaitOuvert) return;
-    for (Bouton b : boutons) {
-      if (b.isSourisEnfonce() && contient(e, b)) b.appliquerAction();
-      b.setSourisEnfonce(false);
-    }
+    if (!comboEtaitOuvert) relacherBoutons(e);
   }
 }

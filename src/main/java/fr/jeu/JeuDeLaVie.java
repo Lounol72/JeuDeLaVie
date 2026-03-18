@@ -34,6 +34,7 @@ public class JeuDeLaVie implements Observable {
 
   /** Si true, le terminal affiche les stats en console à chaque génération. */
   private volatile boolean terminalActif = false;
+
   private volatile boolean couleurActive = false;
   private volatile boolean torique = false;
 
@@ -44,8 +45,8 @@ public class JeuDeLaVie implements Observable {
 
   /** Constructeur du jeu de la vie, initialise le jeu avec les variables par "Défaut". */
   public JeuDeLaVie() {
-    maxX = 800;
-    maxY = 600;
+    maxX = 2000;
+    maxY = 1000;
     initClasses();
   }
 
@@ -66,8 +67,9 @@ public class JeuDeLaVie implements Observable {
     for (int i = 0; i < grille.length; i++) {
       for (int j = 0; j < grille[i].length; j++) {
         boolean vivante = rnd.nextBoolean();
-        grille[i][j] = new Cellule(
-            vivante ? CelluleEtatVivant.getInstance() : CelluleEtatMort.getInstance(), i, j);
+        grille[i][j] =
+            new Cellule(
+                vivante ? CelluleEtatVivant.getInstance() : CelluleEtatMort.getInstance(), i, j);
         if (vivante) pop++;
       }
     }
@@ -110,7 +112,7 @@ public class JeuDeLaVie implements Observable {
     if (couleurActive) {
       regle = visiteurCouleur; // couleur → terminal → visiteur
     } else if (terminalActif) {
-      regle = terminal;        // terminal → visiteur
+      regle = terminal; // terminal → visiteur
     } else {
       regle = visiteur;
     }
@@ -124,9 +126,7 @@ public class JeuDeLaVie implements Observable {
     population = pop;
   }
 
-  /**
-   * Remet toutes les cellules à l'état mort et réinitialise les compteurs.
-   */
+  /** Remet toutes les cellules à l'état mort et réinitialise les compteurs. */
   public void clearGrille() {
     numGeneration = 0;
     population = 0;
@@ -181,7 +181,8 @@ public class JeuDeLaVie implements Observable {
     boolean[][] snap = m.getEtat();
     for (int x = 0; x < maxX; x++) {
       for (int y = 0; y < maxY; y++) {
-        if (snap[x][y]) grille[x][y].vit(); else grille[x][y].meurt();
+        if (snap[x][y]) grille[x][y].vit();
+        else grille[x][y].meurt();
       }
     }
     numGeneration = m.getNumGeneration();

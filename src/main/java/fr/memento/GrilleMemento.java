@@ -13,8 +13,11 @@ public class GrilleMemento {
     this.numGeneration = numGeneration;
   }
 
+  /** Retourne une copie défensive du snapshot (le Memento reste immuable). */
   public boolean[][] getEtat() {
-    return etat;
+    boolean[][] copie = new boolean[etat.length][];
+    for (int i = 0; i < etat.length; i++) copie[i] = etat[i].clone();
+    return copie;
   }
 
   public int getNumGeneration() {

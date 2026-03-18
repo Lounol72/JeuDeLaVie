@@ -34,6 +34,7 @@
 /home/lounol72/Projets/DP/JeuDeLaVie/src/main/java/fr/ui/bouton/BoutonAction.java
 /home/lounol72/Projets/DP/JeuDeLaVie/src/main/java/fr/ui/bouton/BoutonAvancer.java
 /home/lounol72/Projets/DP/JeuDeLaVie/src/main/java/fr/ui/bouton/BoutonChangeurEtat.java
+/home/lounol72/Projets/DP/JeuDeLaVie/src/main/java/fr/ui/bouton/BoutonCouleur.java
 /home/lounol72/Projets/DP/JeuDeLaVie/src/main/java/fr/ui/bouton/BoutonPause.java
 /home/lounol72/Projets/DP/JeuDeLaVie/src/main/java/fr/ui/bouton/BoutonToggleCouleur.java
 /home/lounol72/Projets/DP/JeuDeLaVie/src/main/java/fr/ui/bouton/BoutonToggleDessin.java

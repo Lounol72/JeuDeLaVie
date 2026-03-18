@@ -12,9 +12,9 @@ import java.awt.Color;
  */
 public class VisiteurCouleur extends Visiteur {
 
-  // Dégradé bleu clair (0 voisin) → bleu foncé (8 voisins).
+  // Dégradé bleu clair (0 voisin) -> bleu foncé (8 voisins).
   private static final Color[] PALETTE = {
-    new Color(0xbfdbfe), // 0 voisins — bleu très clair
+    new Color(0xbfdbfe), // 0 voisins - bleu très clair
     new Color(0x93c5fd), // 1 voisin
     new Color(0x60a5fa), // 2 voisins
     new Color(0x3b82f6), // 3 voisins
@@ -22,7 +22,7 @@ public class VisiteurCouleur extends Visiteur {
     new Color(0x1d4ed8), // 5 voisins
     new Color(0x1e40af), // 6 voisins
     new Color(0x1e3a8a), // 7 voisins
-    new Color(0x172554), // 8 voisins — bleu très foncé
+    new Color(0x172554), // 8 voisins - bleu très foncé
   };
 
   private RegleJeu regleDecoree;
@@ -59,9 +59,9 @@ public class VisiteurCouleur extends Visiteur {
   }
 
   /**
-   * Pré-calcule immédiatement les couleurs de toutes les cellules vivantes à partir
-   * de leur nombre de voisins courant. À appeler quand le mode couleur est activé
-   * alors que la simulation est en pause (grilleCouleurs encore vide).
+   * Pré-calcule immédiatement les couleurs de toutes les cellules vivantes à partir de leur nombre
+   * de voisins courant. À appeler quand le mode couleur est activé alors que la simulation est en
+   * pause (grilleCouleurs encore vide).
    */
   public void rafraichirCouleurs(JeuDeLaVie jeuRef) {
     for (int x = 0; x < grilleCouleurs.length; x++) {

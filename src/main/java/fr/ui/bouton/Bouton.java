@@ -23,6 +23,8 @@ public abstract class Bouton implements Positionnable {
 
   /** Police partagée par tous les boutons (Arial gras 17pt). */
   protected static final Font FONT_LABEL = new Font("Arial", Font.BOLD, 17);
+  /** Police compacte utilisée en mode ImGui (Arial plain 12pt). */
+  protected static final Font FONT_LABEL_COMPACT = new Font("Arial", Font.PLAIN, 12);
 
   protected int x;
   protected int y;
@@ -33,6 +35,9 @@ public abstract class Bouton implements Positionnable {
   protected boolean sourisEnfonce;
 
   private static final int ARC = 15;
+  private static final int ARC_COMPACT = 4;
+  private int arc = ARC;
+  private boolean compact = false;
   private RoundRectangle2D.Float rect;
   private final Color[] couleursFond;
 
@@ -50,7 +55,13 @@ public abstract class Bouton implements Positionnable {
 
   protected void creerDelimitation() {
     delimitation = new Rectangle(x, y, largeur, hauteur);
-    rect = new RoundRectangle2D.Float(x, y, largeur, hauteur, ARC, ARC);
+    rect = new RoundRectangle2D.Float(x, y, largeur, hauteur, arc, arc);
+  }
+
+  public void setCompact(boolean c) {
+    this.compact = c;
+    this.arc = c ? ARC_COMPACT : ARC;
+    creerDelimitation();
   }
 
   public abstract void appliquerAction();
@@ -141,7 +152,7 @@ public abstract class Bouton implements Positionnable {
    */
   protected void dessinerLabel(Graphics g, String label) {
     g.setColor(Constants.COULEUR_TEXTE);
-    g.setFont(FONT_LABEL);
+    g.setFont(compact ? FONT_LABEL_COMPACT : FONT_LABEL);
     FontMetrics fm = g.getFontMetrics();
     int lw = fm.stringWidth(label);
     int lx = x + (largeur - lw) / 2;

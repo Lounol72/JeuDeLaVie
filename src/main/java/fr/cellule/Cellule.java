@@ -6,8 +6,9 @@ import fr.visiteur.RegleJeu;
 public class Cellule {
   private CelluleEtat etat;
 
-  private int posX;
-  private int posY;
+  private final int posX;
+  private final int posY;
+  private int nbVoisinsVivants = 0;
 
   public Cellule() {
     // Par defaut, une cellule nait morte
@@ -16,13 +17,13 @@ public class Cellule {
     this.etat = CelluleEtatMort.getInstance();
   }
 
-  public Cellule(CelluleEtat etat, int x, int y) {
+  public Cellule(final CelluleEtat etat, final int x, final int y) {
     this.posX = x;
     this.posY = y;
     this.etat = etat;
   }
 
-  public Cellule(Cellule other) {
+  public Cellule(final Cellule other) {
     this.etat = other.etat;
     this.posX = other.posX;
     this.posY = other.posY;
@@ -48,10 +49,10 @@ public class Cellule {
     return posY;
   }
 
-  public int nbVoisinsVivants(JeuDeLaVie jeuDeLaVie) {
+  public int nbVoisinsVivants(final JeuDeLaVie jeuDeLaVie) {
     int compteur = 0;
-    int maxX = jeuDeLaVie.getMaxX();
-    int maxY = jeuDeLaVie.getMaxY();
+    final int maxX = jeuDeLaVie.getMaxX();
+    final int maxY = jeuDeLaVie.getMaxY();
     for (int dx = -1; dx <= 1; dx++) {
       for (int dy = -1; dy <= 1; dy++) {
         if (dx == 0 && dy == 0) {
@@ -71,6 +72,7 @@ public class Cellule {
         }
       }
     }
+    this.nbVoisinsVivants = compteur;
     return compteur;
   }
 
@@ -79,7 +81,7 @@ public class Cellule {
     return "Cellule " + posX + "|" + posY + "est " + (estVivante() ? "vivante" : "morte");
   }
 
-  public void accepte(RegleJeu regle) {
+  public void accepte(final RegleJeu regle) {
     if (estVivante()) {
       regle.visiteCelluleVivante(this);
     } else {

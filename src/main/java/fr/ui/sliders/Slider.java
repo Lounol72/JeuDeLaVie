@@ -33,6 +33,10 @@ public class Slider implements Positionnable {
 
   private final IntConsumer onValueChange;
 
+  /** Cache de la couleur active de la piste (évite new Color() à chaque frame). */
+  private Color couleurPisteActive;
+  private Color derniereCouleurVivante;
+
   /**
    * @param x position X
    * @param y position Y
@@ -79,12 +83,15 @@ public class Slider implements Positionnable {
     g2d.fill(rectPiste);
 
     // Portion active (du thumb vers le haut = valeur haute)
-    Color actif = new Color(
-        Constants.COULEUR_CELLULE_VIVANTE.getRed(),
-        Constants.COULEUR_CELLULE_VIVANTE.getGreen(),
-        Constants.COULEUR_CELLULE_VIVANTE.getBlue(),
-        200);
-    g2d.setColor(actif);
+    if (derniereCouleurVivante != Constants.COULEUR_CELLULE_VIVANTE) {
+      derniereCouleurVivante = Constants.COULEUR_CELLULE_VIVANTE;
+      couleurPisteActive = new Color(
+          derniereCouleurVivante.getRed(),
+          derniereCouleurVivante.getGreen(),
+          derniereCouleurVivante.getBlue(),
+          200);
+    }
+    g2d.setColor(couleurPisteActive);
     int activeH = (y + hauteur) - thumbY;
     if (activeH > 0) {
       g2d.fillRoundRect(pisteX, thumbY, LARGEUR_PISTE, activeH, LARGEUR_PISTE, LARGEUR_PISTE);

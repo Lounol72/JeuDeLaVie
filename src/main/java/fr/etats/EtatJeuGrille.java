@@ -26,6 +26,7 @@ import java.awt.Graphics2D;
 import java.awt.RenderingHints;
 import java.awt.event.KeyEvent;
 import java.awt.event.MouseEvent;
+import java.util.ArrayDeque;
 import java.util.ArrayList;
 
 /**
@@ -48,9 +49,9 @@ public class EtatJeuGrille extends Etats {
   // Constantes UI
   // -------------------------------------------------------------------------
 
-  private static final int LARGEUR_BOUTON = 200;
-  private static final int HAUTEUR_BOUTON = 44;
-  private static final int GAP_BOUTONS = 20;
+  private static final int HAUTEUR_BOUTON = 24;
+  private static final int GAP_BOUTONS    = 5;
+  private static final int MARGE_BARRE   = 10;
 
   private static final int LARGEUR_SLIDER = 28;
   private static final int HAUTEUR_SLIDER = 200;
@@ -83,12 +84,21 @@ public class EtatJeuGrille extends Etats {
   // État de la grille
   // -------------------------------------------------------------------------
 
-  private static int maxX;
-  private static int maxY;
+  private int maxX;
+  private int maxY;
 
   private final JeuDeLaVie jeuDeLaVie;
   private final HistoriqueGrille historique = new HistoriqueGrille(30);
   private int compteurUpdates = 0;
+
+  // -------------------------------------------------------------------------
+  // Historique population
+  // -------------------------------------------------------------------------
+
+  private static final int HIST_TAILLE = 100;
+  private final ArrayDeque<Integer> historiquePopulation = new ArrayDeque<>();
+  /** Snapshot converti en int[] pour éviter l'allocation Integer[] à chaque frame. */
+  private int[] histSnapshot = new int[0];
 
   // -------------------------------------------------------------------------
   // Zoom
@@ -171,11 +181,15 @@ public class EtatJeuGrille extends Etats {
 
     BoutonAction aleatoire = new BoutonAction(0, 0, 0, 0, "Aléatoire", () -> {
       historique.sauvegarder(jeuDeLaVie.creerMemento());
+      historiquePopulation.clear();
+      histSnapshot = new int[0];
       jeuDeLaVie.initialiseGrille();
       jeuDeLaVie.notifieObservateur();
     });
     BoutonAction effacer = new BoutonAction(0, 0, 0, 0, "Effacer", () -> {
       historique.sauvegarder(jeuDeLaVie.creerMemento());
+      historiquePopulation.clear();
+      histSnapshot = new int[0];
       jeuDeLaVie.clearGrille();
     });
     BoutonAction undo = new BoutonAction(0, 0, 0, 0, "\u21A9 Undo", this::annuler);
@@ -224,6 +238,8 @@ public class EtatJeuGrille extends Etats {
     boutons.add(pulsar);
     boutons.add(lwss);
 
+    boutons.forEach(b -> b.setCompact(true));
+
     slider =
         new Slider(
             0, 0, LARGEUR_SLIDER, HAUTEUR_SLIDER, 0, 100, VALEUR_NORMALE,
@@ -243,37 +259,33 @@ public class EtatJeuGrille extends Etats {
               clampOffset(Constants.jeu_largeur, Constants.jeu_hauteur);
             });
 
-    // --- Row 1 : Retour / Pause / Avancer / Dessin  (h - 130) ---
-    enregistrer(retour,   (w, h) -> row4(w, h, 0, h - 130));
-    enregistrer(pause,    (w, h) -> row4(w, h, 1, h - 130));
-    enregistrer(avancer,  (w, h) -> row4(w, h, 2, h - 130));
-    enregistrer(dessiner, (w, h) -> row4(w, h, 3, h - 130));
+    // --- Row 1 : 8 boutons  (h - 67) ---
+    enregistrer(retour,    (w, h) -> rowN(w, 8, 0, h - 67));
+    enregistrer(pause,     (w, h) -> rowN(w, 8, 1, h - 67));
+    enregistrer(avancer,   (w, h) -> rowN(w, 8, 2, h - 67));
+    enregistrer(dessiner,  (w, h) -> rowN(w, 8, 3, h - 67));
+    enregistrer(aleatoire, (w, h) -> rowN(w, 8, 4, h - 67));
+    enregistrer(effacer,   (w, h) -> rowN(w, 8, 5, h - 67));
+    enregistrer(undo,      (w, h) -> rowN(w, 8, 6, h - 67));
+    enregistrer(redo,      (w, h) -> rowN(w, 8, 7, h - 67));
 
-    // --- Row 2 : Aléatoire / Effacer / Undo / Redo  (h - 194) ---
-    enregistrer(aleatoire, (w, h) -> row4(w, h, 0, h - 194));
-    enregistrer(effacer,   (w, h) -> row4(w, h, 1, h - 194));
-    enregistrer(undo,      (w, h) -> row4(w, h, 2, h - 194));
-    enregistrer(redo,      (w, h) -> row4(w, h, 3, h - 194));
-
-    // --- Row 3 : Sauv. / Char. / Glider / Blinker  (h - 258) ---
-    enregistrer(sauv,    (w, h) -> row4(w, h, 0, h - 258));
-    enregistrer(char_,   (w, h) -> row4(w, h, 1, h - 258));
-    enregistrer(glider,  (w, h) -> row4(w, h, 2, h - 258));
-    enregistrer(blinker, (w, h) -> row4(w, h, 3, h - 258));
-
-    // --- Row 4 : Pulsar / LWSS  (h - 322) ---
-    enregistrer(pulsar, (w, h) -> row4(w, h, 0, h - 322));
-    enregistrer(lwss,   (w, h) -> row4(w, h, 1, h - 322));
+    // --- Row 2 : 6 boutons  (h - 38) ---
+    enregistrer(sauv,    (w, h) -> rowN(w, 6, 0, h - 38));
+    enregistrer(char_,   (w, h) -> rowN(w, 6, 1, h - 38));
+    enregistrer(glider,  (w, h) -> rowN(w, 6, 2, h - 38));
+    enregistrer(blinker, (w, h) -> rowN(w, 6, 3, h - 38));
+    enregistrer(pulsar,  (w, h) -> rowN(w, 6, 4, h - 38));
+    enregistrer(lwss,    (w, h) -> rowN(w, 6, 5, h - 38));
 
     enregistrer(slider,    (w, h) -> new int[]{ w - MARGIN_SLIDER - LARGEUR_SLIDER, (h - HAUTEUR_SLIDER) / 2, LARGEUR_SLIDER, HAUTEUR_SLIDER });
     enregistrer(sliderZoom,(w, h) -> new int[]{ w - MARGIN_SLIDER - LARGEUR_SLIDER * 2 - GAP_SLIDERS, (h - HAUTEUR_SLIDER) / 2, LARGEUR_SLIDER, HAUTEUR_SLIDER });
   }
 
-  /** Retourne les dimensions d'un bouton dans une rangée de 4 éléments (indice 0-3). */
-  private static int[] row4(int w, int h, int index, int rowY) {
-    int bw = Math.min(LARGEUR_BOUTON, (w - GAP_BOUTONS * 3) / 4);
-    int totalW = bw * 4 + GAP_BOUTONS * 3;
-    int sx = (w - totalW) / 2;
+  /** Retourne les dimensions d'un bouton dans une rangée de {@code n} éléments. */
+  private static int[] rowN(int w, int n, int index, int rowY) {
+    int usableW = w - 2 * MARGE_BARRE;
+    int bw = (usableW - GAP_BOUTONS * (n - 1)) / n;
+    int sx = MARGE_BARRE;
     return new int[]{ sx + index * (bw + GAP_BOUTONS), rowY, bw, HAUTEUR_BOUTON };
   }
 
@@ -363,6 +375,12 @@ public class EtatJeuGrille extends Etats {
     if (compteurUpdates >= updatesParGenerationCache) {
       compteurUpdates = 0;
       jeuDeLaVie.calculerGenerationSuivante();
+      if (historiquePopulation.size() >= HIST_TAILLE)
+        historiquePopulation.pollFirst();
+      historiquePopulation.addLast(jeuDeLaVie.getPopulation());
+      int i = 0;
+      histSnapshot = new int[historiquePopulation.size()];
+      for (int v : historiquePopulation) histSnapshot[i++] = v;
     }
   }
 
@@ -377,11 +395,14 @@ public class EtatJeuGrille extends Etats {
     clampOffset(largeur, hauteur);
   }
 
-  private static final Font POLICE_HUD   = new Font("Arial", Font.PLAIN, 14);
-  private static final Font POLICE_PAUSE = new Font("Arial", Font.BOLD,  20);
-  private static final Font POLICE_LABEL = new Font("Arial", Font.BOLD,  13);
+  private static final Font POLICE_HUD        = new Font("Arial", Font.PLAIN, 14);
+  private static final Font POLICE_HUD_MINI   = new Font("Arial", Font.PLAIN, 10);
+  private static final Font POLICE_PAUSE      = new Font("Arial", Font.BOLD,  20);
+  private static final Font POLICE_LABEL      = new Font("Arial", Font.BOLD,  13);
   private static final Color COULEUR_HUD_FOND   = new Color(0x06, 0x09, 0x10, 220);
   private static final Color COULEUR_PAUSE_FOND = new Color(0, 0, 0, 160);
+  private static final Color COULEUR_GRAPHE_FOND = new Color(0x01, 0x05, 0x0A, 180);
+  private static final Color COULEUR_GRAPHE_FILL = new Color(0x44, 0xBB, 0xFF, 60);
 
   @Override
   public void dessiner(Graphics g) {
@@ -400,7 +421,7 @@ public class EtatJeuGrille extends Etats {
     }
 
     // Barre de contrôles — fond semi-transparent en bas
-    int barreH = 340;
+    int barreH = 80;
     g.setColor(Constants.COULEUR_BARRE_CONTROLES);
     g.fillRect(0, Constants.jeu_hauteur - barreH, Constants.jeu_largeur, barreH);
 
@@ -432,7 +453,12 @@ public class EtatJeuGrille extends Etats {
     int paddingH = 12;
     int paddingV = 8;
     int boxW = Math.max(fm.stringWidth(ligne1), Math.max(fm.stringWidth(ligne2), fm.stringWidth(ligne3))) + paddingH * 2;
-    int boxH = lineH * 3 + paddingV * 2;
+    int boxHTexte = lineH * 3 + paddingV * 2;
+
+    boolean avecGraphe = !historiquePopulation.isEmpty();
+    int graphH = 48;
+    int graphGap = 6;
+    int boxH = avecGraphe ? boxHTexte + graphGap + graphH + paddingV : boxHTexte;
     int boxX = 10;
     int boxY = 10;
 
@@ -445,6 +471,58 @@ public class EtatJeuGrille extends Etats {
     g2.drawString(ligne1, textX, textY);
     g2.drawString(ligne2, textX, textY + lineH);
     g2.drawString(ligne3, textX, textY + lineH * 2);
+
+    if (avecGraphe) {
+      dessinerGraphePopulation(g2, boxX, boxY, boxW, boxHTexte, paddingH, graphGap, graphH);
+    }
+  }
+
+  private void dessinerGraphePopulation(Graphics2D g2, int boxX, int boxY, int boxW,
+      int boxHTexte, int paddingH, int graphGap, int graphH) {
+    int graphX = boxX + paddingH;
+    int graphY = boxY + boxHTexte + graphGap;
+    int graphW = boxW - paddingH * 2;
+
+    // Fond du graphe
+    g2.setColor(COULEUR_GRAPHE_FOND);
+    g2.fillRoundRect(graphX, graphY, graphW, graphH, 4, 4);
+
+    int[] hist = histSnapshot;
+    int n = hist.length;
+
+    int popMax = 1;
+    for (int v : hist) if (v > popMax) popMax = v;
+
+    // Construire le polygone rempli (fill sous la courbe)
+    int[] polyX = new int[n + 2];
+    int[] polyY = new int[n + 2];
+    for (int i = 0; i < n; i++) {
+      polyX[i] = graphX + (int) Math.round((double) i / (HIST_TAILLE - 1) * graphW);
+      polyY[i] = graphY + graphH - 1 - (int) Math.round((double) hist[i] / popMax * (graphH - 2));
+    }
+    // Fermer vers le bas
+    polyX[n]     = polyX[n - 1];
+    polyY[n]     = graphY + graphH - 1;
+    polyX[n + 1] = polyX[0];
+    polyY[n + 1] = graphY + graphH - 1;
+
+    g2.setColor(COULEUR_GRAPHE_FILL);
+    g2.fillPolygon(polyX, polyY, n + 2);
+
+    // Tracer la courbe
+    g2.setColor(Constants.COULEUR_CELLULE_VIVANTE);
+    for (int i = 0; i < n - 1; i++) {
+      g2.drawLine(polyX[i], polyY[i], polyX[i + 1], polyY[i + 1]);
+    }
+
+    // Labels axe Y
+    g2.setFont(POLICE_HUD_MINI);
+    FontMetrics fmMini = g2.getFontMetrics();
+    g2.setColor(Constants.COULEUR_TEXTE);
+    String labelMax = String.valueOf(popMax);
+    String labelZero = "0";
+    g2.drawString(labelMax,  graphX + graphW + 2, graphY + fmMini.getAscent());
+    g2.drawString(labelZero, graphX + graphW + 2, graphY + graphH);
   }
 
   private void dessinerPauseOverlay(Graphics g) {
@@ -502,6 +580,17 @@ public class EtatJeuGrille extends Etats {
     int startY = Math.max(0, (-offsetPixelY) / tc);
     int endX = Math.min(maxX, startX + (largeur / tc) + 2);
     int endY = Math.min(maxY, startY + (hauteur / tc) + 2);
+
+    // Fond des cellules mortes (si différent du fond de grille)
+    Color morte = Constants.COULEUR_CELLULE_MORTE;
+    if (!morte.equals(Constants.COULEUR_FOND_GRILLE)) {
+      g.setColor(morte);
+      g.fillRect(
+          offsetPixelX + startX * tc,
+          offsetPixelY + startY * tc,
+          (endX - startX) * tc,
+          (endY - startY) * tc);
+    }
 
     boolean couleurActive = jeuDeLaVie.isCouleurActive();
 

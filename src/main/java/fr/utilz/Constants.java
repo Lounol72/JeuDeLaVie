@@ -10,11 +10,12 @@ public class Constants {
   /** Palette UI : thème sombre avec accents verts (Jeu de la Vie). */
   // Fonds
   public static final Color COULEUR_FOND_MENU       = new Color(0x0d, 0x14, 0x1f);
-  public static final Color COULEUR_FOND_GRILLE      = new Color(0x08, 0x0d, 0x12);
+  public static Color COULEUR_FOND_GRILLE             = new Color(0x08, 0x0d, 0x12);
   public static final Color COULEUR_FOND_PARAMETRES  = new Color(0x0d, 0x14, 0x1f);
 
   // Accent principal
-  public static final Color COULEUR_CELLULE_VIVANTE  = new Color(0x4a, 0xde, 0x80);
+  public static Color COULEUR_CELLULE_VIVANTE         = new Color(0x4a, 0xde, 0x80);
+  public static Color COULEUR_CELLULE_MORTE           = new Color(0x08, 0x0d, 0x12);
 
   // Boutons — états bien distincts
   public static final Color COULEUR_BOUTON_NORMAL    = new Color(0x1e, 0x29, 0x3b, 235);

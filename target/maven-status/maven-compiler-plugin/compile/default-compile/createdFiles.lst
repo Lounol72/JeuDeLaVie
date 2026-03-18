@@ -14,6 +14,7 @@ fr/ui/bouton/BoutonToggleCouleur.class
 fr/memento/GrilleMemento.class
 fr/jeu/FenetreJeu$2.class
 fr/cellule/CelluleEtatMort.class
+fr/ui/bouton/BoutonCouleur.class
 fr/commande/CommandeMeurt.class
 fr/etats/EtatJeu.class
 fr/etats/Parametres.class

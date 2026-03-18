@@ -31,6 +31,24 @@ public abstract class Etats implements MethodesEtats {
     return bouton.getDelimitation().contains(evt.getX(), evt.getY());
   }
 
+  /** Met à jour l'état de survol de tous les boutons. */
+  protected void actualiserSurvol(MouseEvent e) {
+    for (Bouton b : boutons) b.setSourisSurvol(contient(e, b));
+  }
+
+  /** Marque enfoncés les boutons sous le curseur. */
+  protected void enfoncerBoutons(MouseEvent e) {
+    for (Bouton b : boutons) { if (contient(e, b)) b.setSourisEnfonce(true); }
+  }
+
+  /** Déclenche l'action des boutons relâchés sous le curseur, puis réinitialise leur état. */
+  protected void relacherBoutons(MouseEvent e) {
+    for (Bouton b : boutons) {
+      if (b.isSourisEnfonce() && contient(e, b)) b.appliquerAction();
+      b.setSourisEnfonce(false);
+    }
+  }
+
   /**
    * Enregistre un élément avec son calcul de position et l'applique immédiatement
    * avec les dimensions courantes de la fenêtre.

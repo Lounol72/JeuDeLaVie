@@ -77,35 +77,9 @@ public class Menu extends Etats {
   @Override
   public void toucheTapee(KeyEvent e) {}
 
-  @Override
-  public void sourisDeplacee(MouseEvent e) {
-    for (Bouton b : boutons) {
-      b.setSourisSurvol(contient(e, b));
-    }
-  }
-
-  @Override
-  public void sourisGlissee(MouseEvent e) {}
-
-  @Override
-  public void sourisCliquee(MouseEvent e) {}
-
-  @Override
-  public void sourisEnfoncee(MouseEvent e) {
-    for (Bouton b : boutons) {
-      if (contient(e, b)) {
-        b.setSourisEnfonce(true);
-      }
-    }
-  }
-
-  @Override
-  public void sourisRelachee(MouseEvent e) {
-    for (Bouton b : boutons) {
-      if (b.isSourisEnfonce() && contient(e, b)) {
-        b.appliquerAction();
-      }
-      b.setSourisEnfonce(false);
-    }
-  }
+  @Override public void sourisDeplacee(MouseEvent e) { actualiserSurvol(e); }
+  @Override public void sourisGlissee(MouseEvent e)  {}
+  @Override public void sourisCliquee(MouseEvent e)  {}
+  @Override public void sourisEnfoncee(MouseEvent e) { enfoncerBoutons(e); }
+  @Override public void sourisRelachee(MouseEvent e) { relacherBoutons(e); }
 }

@@ -24,6 +24,7 @@ public class ComboBoxVisiteur implements Positionnable {
 
   private static final int ARC = 15;
   private static final Font FONT_LABEL = new Font("Arial", Font.BOLD, 16);
+  private static final Color COULEUR_DROPDOWN_FOND = new Color(0x0f, 0x17, 0x24, 248);
 
   private final TypeVisiteur[] options = TypeVisiteur.values();
   private TypeVisiteur selectionCourante;
@@ -35,6 +36,11 @@ public class ComboBoxVisiteur implements Positionnable {
   private int largeur;
   private int hauteurLigne;
   private Rectangle delimitation;
+  private RoundRectangle2D.Float rectBouton;
+
+  /** Cache pour COULEUR_CELLULE_VIVANTE.darker() — évite l'appel à chaque frame. */
+  private Color couleurSelection;
+  private Color derniereCouleurVivante;
 
   private final JeuDeLaVie jeu;
 
@@ -46,6 +52,7 @@ public class ComboBoxVisiteur implements Positionnable {
     this.jeu = jeu;
     this.selectionCourante = jeu.getTypeVisiteurActif();
     delimitation = new Rectangle(x, y, largeur, hauteurLigne);
+    rectBouton = new RoundRectangle2D.Float(x, y, largeur, hauteurLigne, ARC, ARC);
   }
 
   public void setBounds(int x, int y, int largeur, int hauteurLigne) {
@@ -54,6 +61,7 @@ public class ComboBoxVisiteur implements Positionnable {
     this.largeur = largeur;
     this.hauteurLigne = hauteurLigne;
     delimitation = new Rectangle(x, y, largeur, hauteurLigne);
+    rectBouton = new RoundRectangle2D.Float(x, y, largeur, hauteurLigne, ARC, ARC);
   }
 
   public Rectangle getDelimitation() {
@@ -71,9 +79,9 @@ public class ComboBoxVisiteur implements Positionnable {
     Color fondFerme =
         ouvert ? Constants.COULEUR_BOUTON_ENFONCE : Constants.COULEUR_BOUTON_NORMAL;
     g2d.setColor(fondFerme);
-    g2d.fill(new RoundRectangle2D.Float(x, y, largeur, hauteurLigne, ARC, ARC));
+    g2d.fill(rectBouton);
     g2d.setColor(Constants.COULEUR_BOUTON_BORDURE);
-    g2d.draw(new RoundRectangle2D.Float(x, y, largeur, hauteurLigne, ARC, ARC));
+    g2d.draw(rectBouton);
 
     g2d.setFont(FONT_LABEL);
     g2d.setColor(Constants.COULEUR_TEXTE);
@@ -96,7 +104,7 @@ public class ComboBoxVisiteur implements Positionnable {
     int listY = y + hauteurLigne;
     int totalHauteur = options.length * hauteurLigne;
 
-    g2d.setColor(new Color(0x0f, 0x17, 0x24, 248));
+    g2d.setColor(COULEUR_DROPDOWN_FOND);
     g2d.fillRoundRect(x, listY, largeur, totalHauteur, ARC, ARC);
     g2d.setColor(Constants.COULEUR_BOUTON_BORDURE);
     g2d.drawRoundRect(x, listY, largeur, totalHauteur, ARC, ARC);
@@ -105,9 +113,13 @@ public class ComboBoxVisiteur implements Positionnable {
       int oy = listY + i * hauteurLigne;
       TypeVisiteur opt = options[i];
 
+      if (derniereCouleurVivante != Constants.COULEUR_CELLULE_VIVANTE) {
+        derniereCouleurVivante = Constants.COULEUR_CELLULE_VIVANTE;
+        couleurSelection = Constants.COULEUR_CELLULE_VIVANTE.darker();
+      }
       Color fond;
       if (opt == selectionCourante) {
-        fond = Constants.COULEUR_CELLULE_VIVANTE.darker();
+        fond = couleurSelection;
       } else if (i == indexSurvol) {
         fond = Constants.COULEUR_BOUTON_SURVOL;
       } else {
