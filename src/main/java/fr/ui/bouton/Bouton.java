@@ -1,5 +1,6 @@
 package fr.ui.bouton;
 
+import fr.ui.Positionnable;
 import fr.utilz.Constants;
 import java.awt.Color;
 import java.awt.Font;
@@ -18,10 +19,10 @@ import java.awt.geom.RoundRectangle2D;
  * {@link #appliquerAction()} et appellent {@link #dessinerLabel(Graphics, String)} pour
  * afficher leur libellé sans dupliquer la logique de centrage.
  */
-public abstract class Bouton {
+public abstract class Bouton implements Positionnable {
 
-  /** Police partagée par tous les boutons (Arial gras 16pt). */
-  protected static final Font FONT_LABEL = new Font("Arial", Font.BOLD, 16);
+  /** Police partagée par tous les boutons (Arial gras 17pt). */
+  protected static final Font FONT_LABEL = new Font("Arial", Font.BOLD, 17);
 
   protected int x;
   protected int y;

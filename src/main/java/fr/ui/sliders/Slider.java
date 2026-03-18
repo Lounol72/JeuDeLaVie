@@ -1,5 +1,6 @@
 package fr.ui.sliders;
 
+import fr.ui.Positionnable;
 import fr.utilz.Constants;
 import java.awt.Color;
 import java.awt.Graphics;
@@ -13,10 +14,10 @@ import java.util.function.IntConsumer;
  * Slider vertical personnalisé : dessin via Graphics, interaction souris (clic + glisser).
  * Valeur 0-100, affiché uniquement dans l'état qui le contient.
  */
-public class Slider {
+public class Slider implements Positionnable {
 
-  private static final int ARC = 8;
-  private static final int EPAISSEUR_THUMB = 12;
+  private static final int LARGEUR_PISTE = 8;
+  private static final int RAYON_THUMB = 12;
 
   private int x;
   private int y;
@@ -57,48 +58,54 @@ public class Slider {
 
   private void creerFormes() {
     delimitation = new Rectangle(x, y, largeur, hauteur);
-    rectPiste = new RoundRectangle2D.Float(x, y, largeur, hauteur, ARC, ARC);
+    int pisteX = x + (largeur - LARGEUR_PISTE) / 2;
+    rectPiste = new RoundRectangle2D.Float(pisteX, y, LARGEUR_PISTE, hauteur, LARGEUR_PISTE, LARGEUR_PISTE);
   }
 
   private static int clamp(int v, int lo, int hi) {
     return Math.max(lo, Math.min(hi, v));
   }
 
-  /** Dessine le slider (piste + curseur). */
+  /** Dessine le slider (piste + portion active + thumb circulaire). */
   public void dessiner(Graphics g) {
     Graphics2D g2d = (Graphics2D) g;
     g2d.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
 
+    int thumbY = valeurVersY(value);
+    int pisteX = x + (largeur - LARGEUR_PISTE) / 2;
+
+    // Piste complète
     g2d.setColor(Constants.COULEUR_SLIDER_PISTE);
     g2d.fill(rectPiste);
-    g2d.setColor(Constants.COULEUR_BOUTON_BORDURE);
-    g2d.draw(rectPiste);
 
-    int thumbY = valeurVersY(value);
-    Color c = (sourisSurvol || enGlissement) ? Constants.COULEUR_SLIDER_THUMB_SURVOL : Constants.COULEUR_SLIDER_THUMB;
-    g2d.setColor(c);
-    g2d.fillRoundRect(
-        x + (largeur - EPAISSEUR_THUMB) / 2,
-        thumbY - EPAISSEUR_THUMB / 2,
-        EPAISSEUR_THUMB,
-        EPAISSEUR_THUMB,
-        ARC,
-        ARC);
+    // Portion active (du thumb vers le haut = valeur haute)
+    Color actif = new Color(
+        Constants.COULEUR_CELLULE_VIVANTE.getRed(),
+        Constants.COULEUR_CELLULE_VIVANTE.getGreen(),
+        Constants.COULEUR_CELLULE_VIVANTE.getBlue(),
+        200);
+    g2d.setColor(actif);
+    int activeH = (y + hauteur) - thumbY;
+    if (activeH > 0) {
+      g2d.fillRoundRect(pisteX, thumbY, LARGEUR_PISTE, activeH, LARGEUR_PISTE, LARGEUR_PISTE);
+    }
+
+    // Thumb circulaire
+    boolean survol = sourisSurvol || enGlissement;
+    int r = survol ? RAYON_THUMB + 2 : RAYON_THUMB;
+    int thumbCx = x + largeur / 2;
+    g2d.setColor(survol ? Constants.COULEUR_SLIDER_THUMB_SURVOL : Constants.COULEUR_SLIDER_THUMB);
+    g2d.fillOval(thumbCx - r, thumbY - r, r * 2, r * 2);
     g2d.setColor(Constants.COULEUR_BOUTON_BORDURE);
-    g2d.drawRoundRect(
-        x + (largeur - EPAISSEUR_THUMB) / 2,
-        thumbY - EPAISSEUR_THUMB / 2,
-        EPAISSEUR_THUMB,
-        EPAISSEUR_THUMB,
-        ARC,
-        ARC);
+    g2d.drawOval(thumbCx - r, thumbY - r, r * 2, r * 2);
   }
 
-  /** Convertit une valeur en coordonnée Y (0 = haut, max = bas). */
+  /** Convertit une valeur en coordonnée Y clampée dans [y+RAYON_THUMB, y+hauteur-RAYON_THUMB]. */
   private int valeurVersY(int v) {
     if (max == min) return y + hauteur / 2;
     double t = (double) (v - min) / (max - min);
-    return y + (int) ((1 - t) * hauteur);
+    int raw = y + (int) ((1 - t) * hauteur);
+    return Math.max(y + RAYON_THUMB, Math.min(y + hauteur - RAYON_THUMB, raw));
   }
 
   /** Convertit une coordonnée Y en valeur. */

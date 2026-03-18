@@ -15,13 +15,14 @@ public class VisiteurFactory {
 
   public static Visiteur creer(TypeVisiteur type, JeuDeLaVie jeu) {
     switch (type) {
-      case HIGH_LIFE:
-        return new VisiteurHighLife(jeu);
-      case DAY_NIGHT:
-        return new VisiteurDayNight(jeu);
+      case HIGH_LIFE:        return new VisiteurHighLife(jeu);
+      case DAY_NIGHT:        return new VisiteurDayNight(jeu);
+      case SEEDS:            return new VisiteurSeeds(jeu);
+      case MAZE:             return new VisiteurMaze(jeu);
+      case REPLICATOR:       return new VisiteurReplicator(jeu);
+      case LIFE_WITHOUT_DEATH: return new VisiteurLifeWithoutDeath(jeu);
       case CLASSIQUE:
-      default:
-        return new VisiteurClassique(jeu);
+      default:               return new VisiteurClassique(jeu);
     }
   }
 }

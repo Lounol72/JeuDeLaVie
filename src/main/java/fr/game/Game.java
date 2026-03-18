@@ -14,4 +14,8 @@ public interface Game {
   JeuDeLaVie getJeuDeLaVie();
 
   void nettoyer();
+
+  int getFps();
+
+  int getUps();
 }

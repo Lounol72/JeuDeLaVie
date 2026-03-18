@@ -1,6 +1,10 @@
 package fr.etats;
 
+import java.awt.Font;
+import java.awt.FontMetrics;
 import java.awt.Graphics;
+import java.awt.Graphics2D;
+import java.awt.RenderingHints;
 import java.awt.event.KeyEvent;
 import java.awt.event.MouseEvent;
 import java.util.ArrayList;
@@ -20,38 +24,45 @@ public class Menu extends Etats {
   public Menu(Game jeu) {
     super(jeu);
     boutons = new ArrayList<>();
-    int cx = Constants.jeu_largeur / 2;
-    int cy = Constants.jeu_hauteur / 2 - 100;
-    int bw = Math.min(LARGEUR_BOUTON, Constants.jeu_largeur / 2);
-    int bh = HAUTEUR_BOUTON;
-    int gap = ESPACEMENT;
 
-    boutons.add(new BoutonChangeurEtat(cx - bw / 2, cy, bw, bh, EtatJeu.GRILLE, "Jouer"));
-    boutons.add(new BoutonChangeurEtat(cx - bw / 2, cy + gap, bw, bh, EtatJeu.PARAMETRES, "Paramètres"));
-    boutons.add(new BoutonChangeurEtat(cx - bw / 2, cy + 2 * gap, bw, bh, EtatJeu.QUITTER, "Quitter"));
+    BoutonChangeurEtat jouer      = new BoutonChangeurEtat(0, 0, 0, 0, EtatJeu.GRILLE,     "Jouer");
+    BoutonChangeurEtat parametres = new BoutonChangeurEtat(0, 0, 0, 0, EtatJeu.PARAMETRES, "Paramètres");
+    BoutonChangeurEtat quitter    = new BoutonChangeurEtat(0, 0, 0, 0, EtatJeu.QUITTER,     "Quitter");
+    boutons.add(jouer);
+    boutons.add(parametres);
+    boutons.add(quitter);
+
+    enregistrer(jouer,      (w, h) -> boutonCentral(w, h, 0));
+    enregistrer(parametres, (w, h) -> boutonCentral(w, h, 1));
+    enregistrer(quitter,    (w, h) -> boutonCentral(w, h, 2));
+  }
+
+  private int[] boutonCentral(int w, int h, int index) {
+    int bw = Math.min(LARGEUR_BOUTON, w / 2);
+    return new int[]{ w / 2 - bw / 2, h / 2 - 100 + index * ESPACEMENT, bw, HAUTEUR_BOUTON };
   }
 
   @Override
   public void mettreAJour() {}
 
-  @Override
-  protected void appliquerDisposition(int largeur, int hauteur) {
-    int cx = largeur / 2;
-    int cy = hauteur / 2 - 100;
-    int bw = Math.min(LARGEUR_BOUTON, largeur / 2);
-    int bh = HAUTEUR_BOUTON;
-    int gap = ESPACEMENT;
-
-    for (int i = 0; i < boutons.size(); i++) {
-      boutons.get(i).setBounds(cx - bw / 2, cy + i * gap, bw, bh);
-    }
-  }
+  private static final Font POLICE_TITRE = new Font("Arial", Font.BOLD, 48);
 
   @Override
   public void dessiner(Graphics g) {
     appliquerDispositionSiNecessaire();
     g.setColor(Constants.COULEUR_FOND_MENU);
     g.fillRect(0, 0, Constants.jeu_largeur, Constants.jeu_hauteur);
+
+    Graphics2D g2 = (Graphics2D) g;
+    g2.setRenderingHint(RenderingHints.KEY_TEXT_ANTIALIASING, RenderingHints.VALUE_TEXT_ANTIALIAS_ON);
+    g2.setFont(POLICE_TITRE);
+    g2.setColor(Constants.COULEUR_CELLULE_VIVANTE);
+    FontMetrics fm = g2.getFontMetrics();
+    String titre = "Jeu de la Vie";
+    int tx = (Constants.jeu_largeur - fm.stringWidth(titre)) / 2;
+    int ty = Constants.jeu_hauteur / 4 + fm.getAscent() / 2;
+    g2.drawString(titre, tx, ty);
+
     for (Bouton b : boutons) {
       b.dessiner(g);
     }

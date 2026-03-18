@@ -40,6 +40,14 @@ public class Cellule {
     return etat.estVivant();
   }
 
+  public int getPosX() {
+    return posX;
+  }
+
+  public int getPosY() {
+    return posY;
+  }
+
   public int nbVoisinsVivants(JeuDeLaVie jeuDeLaVie) {
     int compteur = 0;
     int maxX = jeuDeLaVie.getMaxX();
@@ -49,10 +57,14 @@ public class Cellule {
         if (dx == 0 && dy == 0) {
           continue;
         }
-        int nx = posX + dx;
-        int ny = posY + dy;
-        if (nx < 0 || nx >= maxX || ny < 0 || ny >= maxY) {
-          continue;
+        int nx, ny;
+        if (jeuDeLaVie.isTorique()) {
+          nx = ((posX + dx) % maxX + maxX) % maxX;
+          ny = ((posY + dy) % maxY + maxY) % maxY;
+        } else {
+          nx = posX + dx;
+          ny = posY + dy;
+          if (nx < 0 || nx >= maxX || ny < 0 || ny >= maxY) continue;
         }
         if (jeuDeLaVie.getGrille(nx, ny).estVivante()) {
           compteur++;

@@ -160,6 +160,12 @@ public class JeuDeLaVieUi implements Runnable, Observateur, Game {
     }
   }
 
+  @Override
+  public int getFps() { return fpsActuel; }
+
+  @Override
+  public int getUps() { return upsActuel; }
+
   public void nettoyer() {
     if (threadBoucleJeu != null && threadBoucleJeu.isAlive()) {
       threadBoucleJeu.interrupt();

@@ -1,9 +1,9 @@
 package fr.ui;
 
 import fr.jeu.JeuDeLaVie;
+import fr.ui.Positionnable;
 import fr.utilz.Constants;
 import fr.visiteur.TypeVisiteur;
-import fr.visiteur.Visiteur;
 import fr.visiteur.VisiteurFactory;
 import java.awt.Color;
 import java.awt.Font;
@@ -20,7 +20,7 @@ import java.awt.geom.RoundRectangle2D;
  * <p>Fermé : affiche la sélection courante + symbole ▼. Ouvert : liste toutes les options par
  * dessus le reste de l'UI.
  */
-public class ComboBoxVisiteur {
+public class ComboBoxVisiteur implements Positionnable {
 
   private static final int ARC = 15;
   private static final Font FONT_LABEL = new Font("Arial", Font.BOLD, 16);
@@ -96,7 +96,7 @@ public class ComboBoxVisiteur {
     int listY = y + hauteurLigne;
     int totalHauteur = options.length * hauteurLigne;
 
-    g2d.setColor(new Color(0x1a, 0x23, 0x32, 245));
+    g2d.setColor(new Color(0x0f, 0x17, 0x24, 248));
     g2d.fillRoundRect(x, listY, largeur, totalHauteur, ARC, ARC);
     g2d.setColor(Constants.COULEUR_BOUTON_BORDURE);
     g2d.drawRoundRect(x, listY, largeur, totalHauteur, ARC, ARC);
@@ -167,6 +167,10 @@ public class ComboBoxVisiteur {
   }
 
   public void sourisRelachee(int mx, int my) {}
+
+  public boolean isOuvert() {
+    return ouvert;
+  }
 
   private void selectionner(TypeVisiteur type) {
     selectionCourante = type;
