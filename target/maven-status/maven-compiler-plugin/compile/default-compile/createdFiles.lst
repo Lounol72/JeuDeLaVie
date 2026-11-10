@@ -1,7 +1,7 @@
 fr/etats/Menu.class
 fr/ui/bouton/BoutonPause.class
-fr/visiteur/VisiteurDayNight.class
 fr/jeu/FenetreJeu$1.class
+fr/visiteur/VisiteurDayNight.class
 fr/cellule/Cellule.class
 fr/cellule/CelluleEtat.class
 fr/etats/EtatJeuGrille.class
@@ -30,10 +30,10 @@ fr/inputs/ISouris.class
 fr/jeu/JeuDeLaVie.class
 fr/visiteur/VisiteurFactory.class
 fr/ui/sliders/Slider.class
-fr/ui/bouton/BoutonAvancer.class
 fr/inputs/IClavier.class
-fr/visiteur/TypeVisiteur.class
 fr/jeu/PanelJeu$1.class
+fr/ui/bouton/BoutonAvancer.class
+fr/visiteur/TypeVisiteur.class
 fr/ui/bouton/BoutonAction.class
 fr/utilz/Constants.class
 fr/pattern/PatternType.class
@@ -50,12 +50,12 @@ fr/lemansU/App.class
 fr/inputs/AdaptateurClavier.class
 fr/ui/JeuDeLaVieUi.class
 fr/ui/bouton/BoutonToggleDessin.class
-fr/jeu/FenetreJeu.class
 fr/io/GrilleIO.class
+fr/jeu/FenetreJeu.class
 fr/memento/HistoriqueGrille.class
 fr/visiteur/VisiteurCouleur.class
 fr/etats/Etats.class
-fr/game/Game.class
 fr/etats/MethodesEtats.class
+fr/game/Game.class
 fr/jeu/PanelJeu.class
 fr/ui/ComboBoxVisiteur.class
